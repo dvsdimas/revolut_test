@@ -75,15 +75,17 @@ public abstract class BaseDbTest {
 
         try {
 
-            if (connection == null) return;
+            final Connection con = connection;
 
-            try (@Nonnull final Statement statement = connection.createStatement()) {
+            if (con == null) return;
+
+            connection = null;
+
+            try (@Nonnull final Statement statement = con.createStatement()) {
                 statement.execute("SHUTDOWN");
             }
 
-            connection.close();
-
-            connection = null;
+            con.close();
 
         } catch (Throwable e) {
             log.warn("H2 shutdown error " + e.getMessage(), e);
