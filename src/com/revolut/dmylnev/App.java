@@ -1,6 +1,8 @@
 package com.revolut.dmylnev;
 
 
+import com.revolut.dmylnev.database.DbConnectionProvider;
+import com.revolut.dmylnev.database.h2.H2ConnectionProvider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -59,7 +61,10 @@ public class App {
 
         log.info("App starting");
 
+        @Nonnull final DbConnectionProvider dbProvider = new H2ConnectionProvider("test", "user", "password");
+
         try {
+            dbProvider.init();
 
             @Nonnull final ThreadPool threadPool = new QueuedThreadPool(10, 1, 1000);
 
@@ -90,7 +95,9 @@ public class App {
             server.join();
 
         } catch (Throwable th) {
-            log.error("Start Jetty error", th);
+            log.error("Start server error", th);
+        } finally {
+            dbProvider.shutdown();
         }
     }
 
