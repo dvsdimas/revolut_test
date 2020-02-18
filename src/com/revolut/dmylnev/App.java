@@ -4,25 +4,17 @@ package com.revolut.dmylnev;
 import com.revolut.dmylnev.database.DbConnectionProvider;
 import com.revolut.dmylnev.database.DbConnectionProviderFactory;
 import com.revolut.dmylnev.database.h2.H2ConnectionProvider;
+import com.revolut.dmylnev.rest.jetty.JettyFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
-import org.eclipse.jetty.util.thread.ThreadPool;
 import javax.annotation.Nonnull;
 import java.util.Objects;
 
 import static org.apache.logging.log4j.core.LifeCycle.State.STARTED;
 
 /**
- * Hello world!
  *
  */
 
@@ -30,7 +22,7 @@ public class App {
 
     private static final Logger log = LogManager.getLogger(App.class);
 
-    private final static int port = 8090;
+    private final static String portStr = "8090";
 
     static {
 
@@ -74,28 +66,9 @@ public class App {
 
             //----------------------------------------------------------------------------------------------------------
 
+            @Nonnull final String port = System.getProperty("port", portStr);
 
-            @Nonnull final ThreadPool threadPool = new QueuedThreadPool(10, 1, 1000);
-
-            @Nonnull final Server server = new Server(threadPool);
-
-            @Nonnull final ServerConnector connector = new ServerConnector(server);
-
-            connector.setPort(port);
-
-            server.setConnectors(new Connector[] {connector});
-
-            @Nonnull final ServletContextHandler context = new ServletContextHandler();
-
-            context.setContextPath("/");
-//            context.addServlet(HelloServlet.class, "/hello");
-//            context.addServlet(AsyncEchoServlet.class, "/echo/*");
-
-            @Nonnull final HandlerCollection handlers = new HandlerCollection();
-
-            handlers.setHandlers(new Handler[]{context, new DefaultHandler()});
-
-            server.setHandler(handlers);
+            @Nonnull final Server server = JettyFactory.createJetty(Integer.parseInt(port));
 
             server.start();
 
