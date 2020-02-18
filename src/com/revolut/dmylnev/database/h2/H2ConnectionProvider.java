@@ -3,6 +3,7 @@ package com.revolut.dmylnev.database.h2;
 import com.revolut.dmylnev.database.DbConnectionProvider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.h2.Driver;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.BufferedReader;
@@ -42,6 +43,14 @@ public final class H2ConnectionProvider implements DbConnectionProvider {
 
     @Override
     public synchronized void init() throws SQLException, IOException {
+
+        try {
+            final Driver driver = (Driver) Class.forName("org.h2.Driver").getConstructor().newInstance();
+            Objects.requireNonNull(driver);
+        } catch (Throwable th) {
+            log.error("h2 driver init failed");
+            throw new SQLException(th);
+        }
 
         if(connection != null) return;
 
