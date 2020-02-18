@@ -2,6 +2,7 @@ package com.revolut.dmylnev;
 
 
 import com.revolut.dmylnev.database.DbConnectionProvider;
+import com.revolut.dmylnev.database.DbConnectionProviderFactory;
 import com.revolut.dmylnev.database.h2.H2ConnectionProvider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -64,7 +65,15 @@ public class App {
         @Nonnull final DbConnectionProvider dbProvider = new H2ConnectionProvider("test", "user", "password");
 
         try {
+
             dbProvider.init();
+
+            DbConnectionProviderFactory.init(dbProvider);
+
+            log.info("DB successfully init");
+
+            //----------------------------------------------------------------------------------------------------------
+
 
             @Nonnull final ThreadPool threadPool = new QueuedThreadPool(10, 1, 1000);
 

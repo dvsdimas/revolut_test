@@ -55,9 +55,20 @@ public final class H2ConnectionProvider implements DbConnectionProvider {
 
         if(connection == null) return;
 
-        closeConnection(connection);
+        try {
+
+            try (@Nonnull final Statement statement = Objects.requireNonNull(connection.createStatement()) ) {
+                statement.execute("SHUTDOWN");
+            }
+
+            connection.close();
+
+        } catch (Throwable e) {
+            log.warn("H2 shutdown error " + e.getMessage(), e);
+        }
 
         connection = null;
+
     }
 
     @Override
@@ -78,15 +89,9 @@ public final class H2ConnectionProvider implements DbConnectionProvider {
     private void closeConnection(@Nonnull final Connection connection) {
 
         try {
-
-            try (@Nonnull final Statement statement = Objects.requireNonNull(connection.createStatement()) ) {
-                statement.execute("SHUTDOWN");
-            }
-
             connection.close();
-
-        } catch (Throwable e) {
-            log.warn("H2 shutdown error " + e.getMessage(), e);
+        } catch (SQLException e) {
+            log.error("closeConnection error", e);
         }
 
     }

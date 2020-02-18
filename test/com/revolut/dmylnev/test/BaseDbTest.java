@@ -1,6 +1,7 @@
 package com.revolut.dmylnev.test;
 
 import com.revolut.dmylnev.database.DbConnectionProvider;
+import com.revolut.dmylnev.database.DbConnectionProviderFactory;
 import com.revolut.dmylnev.database.h2.H2ConnectionProvider;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -19,7 +20,10 @@ public abstract class BaseDbTest {
 
     @BeforeClass
     public static void init() throws SQLException, IOException {
+
         dbProvider.init();
+
+        DbConnectionProviderFactory.init(dbProvider);
     }
 
     @AfterClass
