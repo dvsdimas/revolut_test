@@ -44,6 +44,8 @@ public final class H2ConnectionProvider implements DbConnectionProvider {
     @Override
     public synchronized void init() throws SQLException, IOException {
 
+        if(connection != null) return;
+
         try {
             final Driver driver = (Driver) Class.forName("org.h2.Driver").getConstructor().newInstance();
             Objects.requireNonNull(driver);
@@ -51,8 +53,6 @@ public final class H2ConnectionProvider implements DbConnectionProvider {
             log.error("h2 driver init failed");
             throw new SQLException(th);
         }
-
-        if(connection != null) return;
 
         connection = getConnection();
 

@@ -1,7 +1,9 @@
 package com.revolut.dmylnev.database;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author dmylnev
@@ -10,19 +12,21 @@ import java.util.Objects;
 
 public final class DbConnectionProviderFactory {
 
-    private static volatile DbConnectionProvider provider;
+    private static @Nonnull final AtomicReference<DbConnectionProvider> provider = new AtomicReference<>();
 
     private DbConnectionProviderFactory() { throw new IllegalStateException(); }
 
     public static synchronized @Nonnull DbConnectionProvider getProvider() {
 
-        if(provider == null) throw new IllegalStateException("DbConnectionProviderFactory hasn't been init");
+        @Nullable final DbConnectionProvider pr = provider.get();
 
-        return provider;
+        if(pr == null) throw new IllegalStateException("DbConnectionProviderFactory hasn't been init");
+
+        return pr;
     }
 
     public static synchronized void init(@Nonnull final DbConnectionProvider provider) {
-        DbConnectionProviderFactory.provider = Objects.requireNonNull(provider);
+        DbConnectionProviderFactory.provider.set(Objects.requireNonNull(provider));
     }
 
 }
