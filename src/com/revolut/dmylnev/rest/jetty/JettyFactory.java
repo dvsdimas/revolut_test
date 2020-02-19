@@ -1,5 +1,6 @@
 package com.revolut.dmylnev.rest.jetty;
 
+import com.revolut.dmylnev.rest.jetty.servlets.AccountServlet;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -31,8 +32,7 @@ public final class JettyFactory {
         @Nonnull final ServletContextHandler context = new ServletContextHandler();
 
         context.setContextPath("/");
-//            context.addServlet(HelloServlet.class, "/hello");
-//            context.addServlet(AsyncEchoServlet.class, "/echo/*");
+        context.addServlet(AccountServlet.class, "/account/*");
 
         @Nonnull final HandlerCollection handlers = new HandlerCollection();
 

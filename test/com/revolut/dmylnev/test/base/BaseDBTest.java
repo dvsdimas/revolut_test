@@ -1,4 +1,4 @@
-package com.revolut.dmylnev.test;
+package com.revolut.dmylnev.test.base;
 
 import com.revolut.dmylnev.database.DbConnectionProvider;
 import com.revolut.dmylnev.database.DbConnectionProviderFactory;

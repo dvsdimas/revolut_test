@@ -1,7 +1,9 @@
-CREATE TABLE "test"
+CREATE TABLE accounts
 (
-    "id"     INTEGER     NOT NULL,
-    "symbol" VARCHAR(45) NOT NULL,
+    id SERIAL,
+    currency VARCHAR(3) DEFAULT NOT NULL,
+    amount   NUMERIC(24, 10) NOT NULL DEFAULT 0,
+    uuid TEXT NOT NULL,
 
-    CONSTRAINT "test_id" PRIMARY KEY ("id")
+    CONSTRAINT accounts_uuid UNIQUE (uuid)
 );
