@@ -34,7 +34,7 @@ public class AccountTest extends BaseRestTest {
 
         log.info("Creating account with currency [{}] and uuid [{}]", currency, uuid.toString());
 
-        @Nonnull final Account createdAccount = restCreateAccount(currency, uuid);
+        @Nonnull final Account createdAccount = restCreateAccount(currency);
 
 //        Assert.assertNotNull(createdAccount);
 

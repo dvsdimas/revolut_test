@@ -6,7 +6,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.UUID;
 
 /**
  * @author dmylnev
@@ -20,7 +19,7 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
     }
 
     @Override
-    public @Nonnull Account createAccount(@Nonnull String currency, @Nonnull UUID uuid) {
+    public @Nonnull Account createAccount(@Nonnull String currency) {
 
 
 

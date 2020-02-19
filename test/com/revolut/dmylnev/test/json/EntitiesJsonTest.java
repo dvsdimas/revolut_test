@@ -6,7 +6,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import javax.annotation.Nonnull;
 import java.math.BigDecimal;
-import java.util.UUID;
 
 /**
  * @author dmylnev
@@ -21,9 +20,8 @@ public class EntitiesJsonTest {
         @Nonnull final Long id = 1L;
         @Nonnull final String currency = "USD";
         @Nonnull final BigDecimal amount = new BigDecimal("123.7");
-        @Nonnull final UUID uuid = UUID.randomUUID();
 
-        @Nonnull final Account account = new Account(id, currency, amount, uuid);
+        @Nonnull final Account account = new Account(id, currency, amount);
 
         @Nonnull final String json = account.toJson();
         @Nonnull final String str = account.toJson();

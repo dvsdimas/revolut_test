@@ -16,7 +16,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * @author dmylnev
@@ -55,10 +54,9 @@ public class BaseRestTest extends BaseDBTest {
         BaseDBTest.shutdown();
     }
 
-    public static @Nonnull Account restCreateAccount(@Nonnull final String currency, @Nonnull final UUID uuid) throws Exception {
+    public static @Nonnull Account restCreateAccount(@Nonnull final String currency) throws Exception {
 
         Objects.requireNonNull(currency);
-        Objects.requireNonNull(uuid);
 
         @Nonnull final HttpClient httpClient = new HttpClient();
 
@@ -69,7 +67,6 @@ public class BaseRestTest extends BaseDBTest {
             @Nonnull final Fields fields = new Fields();
 
             fields.put(Account.PARAM_CURRENCY, currency);
-            fields.put(Account.PARAM_UUID, uuid.toString());
 
             final ContentResponse contentResponse = httpClient.POST(account).content(new FormContentProvider(fields)).send();
 

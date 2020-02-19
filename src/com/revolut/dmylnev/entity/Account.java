@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * @author dmylnev
@@ -13,20 +12,16 @@ import java.util.UUID;
 
 public class Account {
 
-    public static @Nonnull final String PARAM_ID = "id";
     public static @Nonnull final String PARAM_CURRENCY = "currency";
-    public static @Nonnull final String PARAM_UUID = "uuid";
 
     public @Nonnull final Long id;
     public @Nonnull final String currency;
     public @Nonnull final BigDecimal amount;
-    public @Nonnull final UUID uuid;
 
-    public Account(@Nonnull final Long id, @Nonnull final String currency, @Nonnull final BigDecimal amount, @Nonnull final UUID uuid) {
+    public Account(@Nonnull final Long id, @Nonnull final String currency, @Nonnull final BigDecimal amount) {
         this.id = Objects.requireNonNull(id);
         this.currency = Objects.requireNonNull(currency);
         this.amount = Objects.requireNonNull(amount);
-        this.uuid = Objects.requireNonNull(uuid);
     }
 
     public @Nonnull String toJson() {
@@ -47,13 +42,12 @@ public class Account {
 
         return id.equals(account.id) &&
                currency.equals(account.currency) &&
-               amount.compareTo(account.amount) == 0 &&
-               uuid.equals(account.uuid);
+               amount.compareTo(account.amount) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, currency, amount, uuid);
+        return Objects.hash(id, currency, amount);
     }
 
     public static @Nonnull Account fromJson(@Nonnull final String json) {
@@ -62,8 +56,7 @@ public class Account {
 
         @Nonnull final Account account = new Gson().fromJson(json, Account.class);
 
-        if( (account.id == null) || (account.currency == null) || (account.amount == null) || (account.uuid == null) )
-            throw new IllegalArgumentException(json);
+        if( (account.id == null) || (account.currency == null) || (account.amount == null) ) throw new IllegalArgumentException(json);
 
         return account;
     }

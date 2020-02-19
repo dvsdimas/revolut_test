@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.UUID;
 
 /**
  * @author dmylnev
@@ -30,7 +29,7 @@ public class AccountServlet extends HttpServlet {
 
             log.info("Trying to get Account with the id [{}]", strId);
 
-            @Nonnull final Long id = Long.parseLong(strId);
+            @Nonnull final Long id = Long.valueOf(strId);
 
             @Nullable final Account account = ServicesProvider.getAccountService().getAccount(id);
 
@@ -55,7 +54,7 @@ public class AccountServlet extends HttpServlet {
             }
         } catch (Throwable th) {
 
-            log.error("", th);
+            log.error("get account by id error", th);
 
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().print(th.getMessage());
@@ -66,7 +65,6 @@ public class AccountServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         final String[] ca = req.getParameterValues(Account.PARAM_CURRENCY);
-        final String[] ua = req.getParameterValues(Account.PARAM_UUID);
 
         if( (ca == null) || ca[0] == null) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -74,18 +72,11 @@ public class AccountServlet extends HttpServlet {
             return;
         }
 
-        if( (ua == null) || ua[0] == null) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().println("Param " + Account.PARAM_UUID + " not found !");
-            return;
-        }
-
         final String currency = ca[0];
-        final UUID uuid = UUID.fromString(ua[0]);
 
-        log.info("Creating account with currency [{}] and uuid [{}]", currency, uuid.toString());
+        log.info("Creating account with currency [{}]", currency);
 
-        @Nonnull final Account account = ServicesProvider.getAccountService().createAccount(currency, uuid);
+        @Nonnull final Account account = ServicesProvider.getAccountService().createAccount(currency);
 
         @Nonnull final String json = account.toJson();
 
