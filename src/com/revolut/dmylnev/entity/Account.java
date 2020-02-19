@@ -13,6 +13,10 @@ import java.util.UUID;
 
 public class Account {
 
+    public static @Nonnull final String PARAM_ID = "id";
+    public static @Nonnull final String PARAM_CURRENCY = "currency";
+    public static @Nonnull final String PARAM_UUID = "uuid";
+
     public @Nonnull final Long id;
     public @Nonnull final String currency;
     public @Nonnull final BigDecimal amount;
@@ -56,6 +60,11 @@ public class Account {
 
         Objects.requireNonNull(json);
 
-        return new Gson().fromJson(json, Account.class);
+        @Nonnull final Account account = new Gson().fromJson(json, Account.class);
+
+        if( (account.id == null) || (account.currency == null) || (account.amount == null) || (account.uuid == null) )
+            throw new IllegalArgumentException(json);
+
+        return account;
     }
 }

@@ -2,7 +2,10 @@ package com.revolut.dmylnev.test.base;
 
 import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.rest.jetty.JettyFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.client.util.FormContentProvider;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.Fields;
@@ -11,6 +14,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -20,6 +24,8 @@ import java.util.UUID;
  */
 
 public class BaseRestTest extends BaseDBTest {
+
+    private static final Logger log = LogManager.getLogger(BaseRestTest.class);
 
     private static volatile Server server;
 
@@ -58,23 +64,27 @@ public class BaseRestTest extends BaseDBTest {
 
             @Nonnull final Fields fields = new Fields();
 
-            fields.put("currency", currency);
-            fields.put("uuid", uuid.toString());
+            fields.put(Account.PARAM_CURRENCY, currency);
+            fields.put(Account.PARAM_UUID, uuid.toString());
 
-            final String response = httpClient.POST(account).content(new FormContentProvider(fields)).send().getContentAsString();
+            final ContentResponse contentResponse = httpClient.POST(account).content(new FormContentProvider(fields)).send();
+
+            if(contentResponse.getStatus() != HttpServletResponse.SC_OK) {
+                log.error("create account error {}, {}", contentResponse.getStatus(), contentResponse.getContentAsString());
+                throw new IllegalStateException(contentResponse.getContentAsString());
+            }
+
+            final String response = contentResponse.getContentAsString();
 
             Assert.assertNotNull(response);
 
-            // todo
+            log.info(response);
 
-//            return new Account();
-
-            return null;
+            return Account.fromJson(response);
 
         } finally {
             httpClient.stop();
         }
-
     }
 
     public static @Nullable Account restGetAccount(final long id) throws Exception {
@@ -85,18 +95,26 @@ public class BaseRestTest extends BaseDBTest {
 
             httpClient.start();
 
-            final String response = httpClient.GET(account + "/" + id).getContentAsString();
+            final ContentResponse contentResponse = httpClient.GET(account + "/" + id);
+
+            if(contentResponse.getStatus() == HttpServletResponse.SC_NOT_FOUND) return null;
+
+            if(contentResponse.getStatus() != HttpServletResponse.SC_OK) {
+                log.error("get account error {}, {}", contentResponse.getStatus(), contentResponse.getContentAsString());
+                throw new IllegalStateException(contentResponse.getContentAsString());
+            }
+
+            final String response = contentResponse.getContentAsString();
 
             Assert.assertNotNull(response);
 
-            // todo
+            log.info(response);
 
-            return null;
+            return Account.fromJson(response);
 
         } finally {
             httpClient.stop();
         }
-
     }
 
 }

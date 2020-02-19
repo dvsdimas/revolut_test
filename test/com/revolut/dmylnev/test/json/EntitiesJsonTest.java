@@ -1,5 +1,6 @@
 package com.revolut.dmylnev.test.json;
 
+import com.google.gson.JsonSyntaxException;
 import com.revolut.dmylnev.entity.Account;
 import org.junit.Assert;
 import org.junit.Test;
@@ -35,4 +36,15 @@ public class EntitiesJsonTest {
         Assert.assertEquals(account, fromJson);
     }
 
+    @Test(expected = JsonSyntaxException.class)
+    public void failTest() {
+        Account.fromJson("json");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void failTest2() {
+        Account.fromJson("{ \"status\": \"ok\"}");
+    }
+
 }
+
