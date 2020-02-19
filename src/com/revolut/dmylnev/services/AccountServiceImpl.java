@@ -3,6 +3,9 @@ package com.revolut.dmylnev.services;
 import com.revolut.dmylnev.database.DbConnectionProvider;
 import com.revolut.dmylnev.entity.Account;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.UUID;
 
 /**
@@ -25,7 +28,12 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
     }
 
     @Override
-    public @Nonnull Account getAccount(@Nonnull Long id) {
+    public @Nullable Account getAccount(@Nonnull Long id) throws SQLException {
+
+        @Nonnull final Connection con = dbConnectionProvider.getConnection();
+
+
+
         return null;
     }
 }

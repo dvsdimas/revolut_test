@@ -38,6 +38,8 @@ public class BaseRestTest extends BaseDBTest {
     @BeforeClass
     public static void init() throws Exception {
 
+        BaseDBTest.init();
+
         server = JettyFactory.createJetty(port);
 
         server.start();
@@ -49,6 +51,8 @@ public class BaseRestTest extends BaseDBTest {
         server.stop();
 
         server.join();
+
+        BaseDBTest.shutdown();
     }
 
     public static @Nonnull Account restCreateAccount(@Nonnull final String currency, @Nonnull final UUID uuid) throws Exception {

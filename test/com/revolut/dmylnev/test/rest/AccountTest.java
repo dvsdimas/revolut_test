@@ -23,9 +23,9 @@ public class AccountTest extends BaseRestTest {
     @Test
     public void createAccount() throws Exception {
 
-//        @Nullable final Account nullAccount = restGetAccount(1);
-//
-//        Assert.assertNull(nullAccount);
+        @Nullable final Account nullAccount = restGetAccount(1);
+
+        Assert.assertNull(nullAccount);
 
         //--------------------------------------------------------------------------------------------------------------
 

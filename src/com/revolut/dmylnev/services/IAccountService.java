@@ -2,6 +2,8 @@ package com.revolut.dmylnev.services;
 
 import com.revolut.dmylnev.entity.Account;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.sql.SQLException;
 import java.util.UUID;
 
 /**
@@ -13,6 +15,6 @@ public interface IAccountService {
 
     @Nonnull Account createAccount(@Nonnull final String currency, @Nonnull final UUID uuid);
 
-    @Nonnull Account getAccount(@Nonnull final Long id);
+    @Nullable Account getAccount(@Nonnull final Long id) throws SQLException;
 
 }
