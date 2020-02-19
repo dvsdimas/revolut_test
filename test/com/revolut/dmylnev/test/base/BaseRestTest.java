@@ -2,11 +2,17 @@ package com.revolut.dmylnev.test.base;
 
 import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.rest.jetty.JettyFactory;
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.client.util.FormContentProvider;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.util.Fields;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
-
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author dmylnev
@@ -39,8 +45,58 @@ public class BaseRestTest extends BaseDBTest {
         server.join();
     }
 
-//    public @Nonnull Account restCreateAccount() {
-//
-//    }
+    public static @Nonnull Account restCreateAccount(@Nonnull final String currency, @Nonnull final UUID uuid) throws Exception {
+
+        Objects.requireNonNull(currency);
+        Objects.requireNonNull(uuid);
+
+        @Nonnull final HttpClient httpClient = new HttpClient();
+
+        try {
+
+            httpClient.start();
+
+            @Nonnull final Fields fields = new Fields();
+
+            fields.put("currency", currency);
+            fields.put("uuid", uuid.toString());
+
+            final String response = httpClient.POST(account).content(new FormContentProvider(fields)).send().getContentAsString();
+
+            Assert.assertNotNull(response);
+
+            // todo
+
+//            return new Account();
+
+            return null;
+
+        } finally {
+            httpClient.stop();
+        }
+
+    }
+
+    public static @Nullable Account restGetAccount(final long id) throws Exception {
+
+        @Nonnull final HttpClient httpClient = new HttpClient();
+
+        try {
+
+            httpClient.start();
+
+            final String response = httpClient.GET(account + "/" + id).getContentAsString();
+
+            Assert.assertNotNull(response);
+
+            // todo
+
+            return null;
+
+        } finally {
+            httpClient.stop();
+        }
+
+    }
 
 }

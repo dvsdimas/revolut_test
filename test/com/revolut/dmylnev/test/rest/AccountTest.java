@@ -1,15 +1,15 @@
 package com.revolut.dmylnev.test.rest;
 
+import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.test.base.BaseDBTest;
 import com.revolut.dmylnev.test.base.BaseRestTest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.jetty.client.HttpClient;
-import org.eclipse.jetty.client.util.FormContentProvider;
-import org.eclipse.jetty.util.Fields;
 import org.junit.Assert;
 import org.junit.Test;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.UUID;
 
 /**
  * @author dmylnev
@@ -23,36 +23,28 @@ public class AccountTest extends BaseRestTest {
     @Test
     public void createAccount() throws Exception {
 
-       @Nonnull final HttpClient httpClient = new HttpClient();
+        @Nullable final Account nullAccount = restGetAccount(1);
 
-        httpClient.start();
+        Assert.assertNull(nullAccount);
 
-        final String response = httpClient.GET("http://localhost:8080/account/1").getContentAsString();
+        //--------------------------------------------------------------------------------------------------------------
 
-        Assert.assertNotNull(response);
+        @Nonnull final String currency = "USD";
+        @Nonnull final UUID uuid = UUID.randomUUID();
 
+        log.info("Creating account with currency [{}] and uuid [{}]", currency, uuid.toString());
 
-    }
+        @Nonnull final Account createdAccount = restCreateAccount(currency, uuid);
 
-    @Test
-    public void createAccount2() throws Exception {
+//        Assert.assertNotNull(createdAccount);
 
-        @Nonnull final HttpClient httpClient = new HttpClient();
+        //--------------------------------------------------------------------------------------------------------------
 
-        httpClient.start();
+        @Nullable final Account account = restGetAccount(1);
 
-        Fields fields = new Fields();
-        fields.put("fruit", "apple");
+//        Assert.assertNotNull(account);
 
-        final String response = httpClient.POST("http://localhost:8080/account")
-                .content(new FormContentProvider(fields))
-                .send().getContentAsString();
-
-
-
-        Assert.assertNotNull(response);
-
-
+//        Assert.assertEquals(account, createdAccount);
     }
 
 }
