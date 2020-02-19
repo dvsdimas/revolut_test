@@ -1,8 +1,10 @@
 package com.revolut.dmylnev.rest.jetty.servlets;
 
 import com.revolut.dmylnev.entity.Account;
+import com.revolut.dmylnev.services.ServicesProvider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import javax.annotation.Nonnull;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -54,7 +56,15 @@ public class AccountServlet extends HttpServlet {
 
         log.info("Creating account with currency [{}] and uuid [{}]", currency, uuid.toString());
 
+        @Nonnull final Account account = ServicesProvider.getAccountService().createAccount(currency, uuid);
 
+        @Nonnull final String json = account.toJson();
+
+        log.info("Created new account [{}]", json);
+
+        resp.setContentType("application/json");
+        resp.setStatus(HttpServletResponse.SC_OK);
+        resp.getWriter().print(json);
     }
 
 }

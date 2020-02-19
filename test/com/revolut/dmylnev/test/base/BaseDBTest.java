@@ -1,9 +1,9 @@
 package com.revolut.dmylnev.test.base;
 
 import com.revolut.dmylnev.database.DbConnectionProvider;
-import com.revolut.dmylnev.database.DbConnectionProviderFactory;
 import com.revolut.dmylnev.database.h2.H2ConnectionProvider;
 import com.revolut.dmylnev.rest.jetty.JettyFactory;
+import com.revolut.dmylnev.services.ServicesProvider;
 import org.eclipse.jetty.server.Server;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -25,7 +25,7 @@ public abstract class BaseDBTest {
 
         dbProvider.init();
 
-        DbConnectionProviderFactory.init(dbProvider);
+        ServicesProvider.init(dbProvider);
 
         server = JettyFactory.createJetty(8080);
 

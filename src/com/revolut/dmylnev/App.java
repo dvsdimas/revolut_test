@@ -1,10 +1,9 @@
 package com.revolut.dmylnev;
 
-
 import com.revolut.dmylnev.database.DbConnectionProvider;
-import com.revolut.dmylnev.database.DbConnectionProviderFactory;
 import com.revolut.dmylnev.database.h2.H2ConnectionProvider;
 import com.revolut.dmylnev.rest.jetty.JettyFactory;
+import com.revolut.dmylnev.services.ServicesProvider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -60,9 +59,13 @@ public class App {
 
             dbProvider.init();
 
-            DbConnectionProviderFactory.init(dbProvider);
-
             log.info("DB successfully init");
+
+            //----------------------------------------------------------------------------------------------------------
+
+            ServicesProvider.init(dbProvider);
+
+            log.info("Services successfully init");
 
             //----------------------------------------------------------------------------------------------------------
 
