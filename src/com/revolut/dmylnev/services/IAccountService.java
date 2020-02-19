@@ -12,7 +12,7 @@ import java.sql.SQLException;
 
 public interface IAccountService {
 
-    @Nonnull Account createAccount(@Nonnull final String currency);
+    @Nonnull Account createAccount(@Nonnull final String currency) throws SQLException;
 
     @Nullable Account getAccount(@Nonnull final Long id) throws SQLException;
 

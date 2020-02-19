@@ -64,27 +64,36 @@ public class AccountServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        final String[] ca = req.getParameterValues(Account.PARAM_CURRENCY);
+        try {
+            final String[] ca = req.getParameterValues(Account.PARAM_CURRENCY);
 
-        if( (ca == null) || ca[0] == null) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().println("Param " + Account.PARAM_CURRENCY + " not found !");
-            return;
+            if ((ca == null) || ca[0] == null) {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.getWriter().println("Param " + Account.PARAM_CURRENCY + " not found !");
+                return;
+            }
+
+            final String currency = ca[0];
+
+            log.info("Creating account with currency [{}]", currency);
+
+            @Nonnull final Account account = ServicesProvider.getAccountService().createAccount(currency);
+
+            @Nonnull final String json = account.toJson();
+
+            log.info("Created new account [{}]", json);
+
+            resp.setContentType("application/json");
+            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.getWriter().print(json);
+
+        } catch (Throwable th) {
+
+            log.error("create account error", th);
+
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.getWriter().print(th.getMessage());
         }
-
-        final String currency = ca[0];
-
-        log.info("Creating account with currency [{}]", currency);
-
-        @Nonnull final Account account = ServicesProvider.getAccountService().createAccount(currency);
-
-        @Nonnull final String json = account.toJson();
-
-        log.info("Created new account [{}]", json);
-
-        resp.setContentType("application/json");
-        resp.setStatus(HttpServletResponse.SC_OK);
-        resp.getWriter().print(json);
     }
 
 }
