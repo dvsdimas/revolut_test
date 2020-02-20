@@ -1,6 +1,7 @@
 package com.revolut.dmylnev.test.rest;
 
 import com.revolut.dmylnev.entity.Account;
+import com.revolut.dmylnev.services.ServicesProvider;
 import com.revolut.dmylnev.test.base.BaseRestTest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,6 +43,15 @@ public class AccountTest extends BaseRestTest {
         Assert.assertNotNull(account);
 
         Assert.assertEquals(account, createdAccount);
+
+        //--------------------------------------------------------------------------------------------------------------
+
+        @Nullable final Account accountService = ServicesProvider.getAccountService().getAccount(1L);
+
+        Assert.assertNotNull(accountService);
+
+        Assert.assertEquals(accountService, createdAccount);
+
     }
 
 }
