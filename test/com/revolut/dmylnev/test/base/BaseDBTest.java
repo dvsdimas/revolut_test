@@ -14,6 +14,8 @@ import javax.annotation.Nonnull;
 
 public abstract class BaseDBTest {
 
+    public static final double DELTA = 0.0000001;
+
     private static @Nonnull final DbConnectionProvider dbProvider = new H2ConnectionProvider("test", "user", "password");
 
     @BeforeClass
