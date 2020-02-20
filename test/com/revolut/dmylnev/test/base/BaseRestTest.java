@@ -1,6 +1,7 @@
 package com.revolut.dmylnev.test.base;
 
 import com.revolut.dmylnev.entity.Account;
+import com.revolut.dmylnev.entity.Activity;
 import com.revolut.dmylnev.rest.jetty.JettyFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,6 +34,7 @@ public class BaseRestTest extends BaseDBTest {
     private static final String host = "http://localhost:";
     private static final String base = host + port;
     private static final String account = base + "/account";
+    private static final String deposit = base + "/deposit";
 
     @BeforeClass
     public static void init() throws Exception {
@@ -112,6 +114,41 @@ public class BaseRestTest extends BaseDBTest {
             log.info(response);
 
             return Account.fromJson(response);
+
+        } finally {
+            httpClient.stop();
+        }
+    }
+
+    public static @Nonnull Activity restDepositAccount(final long id, @Nonnull final String currency, final double amount) throws Exception {
+
+        Objects.requireNonNull(currency);
+
+        @Nonnull final HttpClient httpClient = new HttpClient();
+
+        try {
+
+            httpClient.start();
+
+            @Nonnull final Fields fields = new Fields();
+
+            fields.put(Account.PARAM_CURRENCY, currency);
+            fields.put(Account.PARAM_AMOUNT, String.valueOf(amount));
+
+            final ContentResponse contentResponse = httpClient.POST(deposit + "/" + id).content(new FormContentProvider(fields)).send();
+
+            if(contentResponse.getStatus() != HttpServletResponse.SC_OK) {
+                log.error("deposit error {}, {}", contentResponse.getStatus(), contentResponse.getContentAsString());
+                throw new IllegalStateException(contentResponse.getContentAsString());
+            }
+
+            final String response = contentResponse.getContentAsString();
+
+            Assert.assertNotNull(response);
+
+            log.info(response);
+
+            return Activity.fromJson(response);
 
         } finally {
             httpClient.stop();

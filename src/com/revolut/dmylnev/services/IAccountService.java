@@ -1,6 +1,7 @@
 package com.revolut.dmylnev.services;
 
 import com.revolut.dmylnev.entity.Account;
+import com.revolut.dmylnev.entity.Activity;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.sql.SQLException;
@@ -15,5 +16,7 @@ public interface IAccountService {
     @Nonnull Account createAccount(@Nonnull final String currency) throws SQLException;
 
     @Nullable Account getAccount(@Nonnull final Long id) throws SQLException;
+
+    @Nonnull Activity deposit(final long id, @Nonnull final String currency, final double amount) throws SQLException;
 
 }

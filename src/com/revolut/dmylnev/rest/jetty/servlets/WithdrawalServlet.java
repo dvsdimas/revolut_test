@@ -17,7 +17,7 @@ public class WithdrawalServlet extends HttpServlet {
     private static final Logger log = LogManager.getLogger(WithdrawalServlet.class);
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
     }
 

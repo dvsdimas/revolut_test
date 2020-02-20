@@ -35,6 +35,7 @@ public class AccountTest extends BaseRestTest {
         @Nonnull final Account createdAccount = restCreateAccount(currency);
 
         Assert.assertNotNull(createdAccount);
+        Assert.assertEquals(currency, createdAccount.currency);
 
         //--------------------------------------------------------------------------------------------------------------
 
