@@ -17,11 +17,13 @@ public class Account {
     public @Nonnull final Long id;
     public @Nonnull final String currency;
     public @Nonnull final BigDecimal amount;
+    public @Nonnull final Long version;
 
-    public Account(@Nonnull final Long id, @Nonnull final String currency, @Nonnull final BigDecimal amount) {
+    public Account(@Nonnull final Long id, @Nonnull final String currency, @Nonnull final BigDecimal amount, @Nonnull final Long version) {
         this.id = Objects.requireNonNull(id);
         this.currency = Objects.requireNonNull(currency);
         this.amount = Objects.requireNonNull(amount);
+        this.version = Objects.requireNonNull(version);
     }
 
     public @Nonnull String toJson() {
@@ -42,7 +44,8 @@ public class Account {
 
         return id.equals(account.id) &&
                currency.equals(account.currency) &&
-               amount.compareTo(account.amount) == 0;
+               amount.compareTo(account.amount) == 0 &&
+               version.equals(account.version);
     }
 
     @Override
@@ -56,7 +59,8 @@ public class Account {
 
         @Nonnull final Account account = new Gson().fromJson(json, Account.class);
 
-        if( (account.id == null) || (account.currency == null) || (account.amount == null) ) throw new IllegalArgumentException(json);
+        if( (account.id == null) || (account.currency == null) || (account.amount == null) || (account.version == null) )
+            throw new IllegalArgumentException(json);
 
         return account;
     }

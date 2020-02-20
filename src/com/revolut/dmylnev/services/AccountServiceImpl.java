@@ -20,7 +20,7 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
 
     private static final Logger log = LogManager.getLogger(AccountServiceImpl.class);
 
-    private static @Nonnull final String getByIdSql = "SELECT id, currency, amount FROM accounts WHERE id = ? FOR UPDATE";
+    private static @Nonnull final String getByIdSql = "SELECT id, currency, amount, version FROM accounts WHERE id = ? FOR UPDATE";
     private static @Nonnull final String getByIdSqlForUp = getByIdSql + " FOR UPDATE";
     private static @Nonnull final String createSql = "INSERT INTO accounts (currency) VALUES (?)";
 
@@ -105,11 +105,11 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
             try (@Nonnull final ResultSet resultSet = statement.executeQuery()) {
 
                 if(resultSet.next()) {
-                    final long readId = resultSet.getLong(1);
-                    final String readCurrency = resultSet.getString(2);
-                    final double readAmount = resultSet.getDouble(3);
 
-                    return new Account(readId, readCurrency, new BigDecimal(readAmount));
+                    return new Account(resultSet.getLong(1),
+                                       resultSet.getString(2),
+                                       BigDecimal.valueOf(resultSet.getDouble(3)),
+                                       resultSet.getLong(4));
                 }
             }
         }

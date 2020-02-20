@@ -17,11 +17,7 @@ public class EntitiesJsonTest {
     @Test
     public void accountToJsonTest() {
 
-        @Nonnull final Long id = 1L;
-        @Nonnull final String currency = "USD";
-        @Nonnull final BigDecimal amount = new BigDecimal("123.7");
-
-        @Nonnull final Account account = new Account(id, currency, amount);
+        @Nonnull final Account account = new Account(1L, "USD", new BigDecimal("123.7"), 0L);
 
         @Nonnull final String json = account.toJson();
         @Nonnull final String str = account.toJson();
