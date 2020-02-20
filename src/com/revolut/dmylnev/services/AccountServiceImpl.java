@@ -15,12 +15,13 @@ import java.sql.*;
  * @since 19.02.2020
  */
 
-@SuppressFBWarnings({"OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE", "UTWR_USE_TRY_WITH_RESOURCES"})
+@SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"})
 public class AccountServiceImpl extends BaseService implements IAccountService {
 
     private static final Logger log = LogManager.getLogger(AccountServiceImpl.class);
 
-    private static @Nonnull final String getByIdSql = "SELECT id, currency, amount FROM accounts WHERE id = ?";
+    private static @Nonnull final String getByIdSql = "SELECT id, currency, amount FROM accounts WHERE id = ? FOR UPDATE";
+    private static @Nonnull final String getByIdSqlForUp = getByIdSql + " FOR UPDATE";
     private static @Nonnull final String createSql = "INSERT INTO accounts (currency) VALUES (?)";
 
     public AccountServiceImpl(@Nonnull DbConnectionProvider dbConnectionProvider) {
@@ -28,93 +29,62 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
     }
 
     @Override
-    public @Nonnull Account createAccount(@Nonnull String currency) throws SQLException {
+    public @Nonnull Account createAccount(@Nonnull final String currency) throws SQLException {
 
         @Nonnull final Connection con = dbConnectionProvider.getConnection();
-
-        @Nullable Account account = null;
-        @Nullable PreparedStatement statement = null;
-        @Nullable  ResultSet resultSet = null;
 
         try {
 
             con.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
 
-            statement = con.prepareStatement(createSql, Statement.RETURN_GENERATED_KEYS);
+            long id;
 
-            statement.setString(1, currency);
+            try (final PreparedStatement statement = con.prepareStatement(createSql, Statement.RETURN_GENERATED_KEYS)) {
 
-            statement.executeUpdate();
+                statement.setString(1, currency);
 
-            resultSet = statement.getGeneratedKeys();
+                statement.executeUpdate();
 
-            if (!resultSet.next()) throw new IllegalStateException("Cannot insert new account");
+                try (final ResultSet resultSet = statement.getGeneratedKeys()) {
 
-            final long id = resultSet.getLong(1);
+                    if (!resultSet.next()) throw new SQLException("Cannot insert new account");
 
-            resultSet.close(); resultSet = null;
-            statement.close(); statement = null;
+                    id = resultSet.getLong(1);
+                }
+            }
 
-            statement = con.prepareStatement(getByIdSql);
-
-            statement.setLong(1, id);
-
-            resultSet = statement.executeQuery();
-
-            if(resultSet.next()) {
-                final long readId = resultSet.getLong(1);
-                final String readCurrency = resultSet.getString(2);
-                final double readAmount = resultSet.getDouble(3);
-
-                account = new Account(readId, readCurrency, new BigDecimal(readAmount));
-            } else throw new IllegalStateException("Cannot insert new account");
+            @Nullable final Account account = getAccountInternal(con, id, false);
 
             con.commit();
 
+            if(account == null) throw new SQLException("Cannot insert new account");
+
+            return account;
+
         } catch (Throwable th) {
-            log.error("getAccount error", th);
+            log.error("createAccount error", th);
             con.rollback();
             throw th;
         }
         finally {
-
-            if(resultSet != null) resultSet.close();
-            if(statement != null) statement.close();
-
             dbConnectionProvider.releaseConnection(con);
         }
-
-        return account;
     }
 
     @Override
-    public @Nullable Account getAccount(@Nonnull Long id) throws SQLException {
+    public @Nullable Account getAccount(@Nonnull final Long id) throws SQLException {
 
         @Nonnull final Connection con = dbConnectionProvider.getConnection();
-
-        @Nullable Account account = null;
-        @Nullable PreparedStatement statement = null;
-        @Nullable  ResultSet resultSet = null;
 
         try {
 
             con.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
 
-            statement = con.prepareStatement(getByIdSql);
-
-            statement.setLong(1, id);
-
-            resultSet = statement.executeQuery();
-
-            if(resultSet.next()) {
-                final long readId = resultSet.getLong(1);
-                final String readCurrency = resultSet.getString(2);
-                final double readAmount = resultSet.getDouble(3);
-
-                account = new Account(readId, readCurrency, new BigDecimal(readAmount));
-            }
+            @Nullable final Account account = getAccountInternal(con, id, false);
 
             con.commit();
+
+            return account;
 
         } catch (Throwable th) {
             log.error("getAccount error", th);
@@ -122,13 +92,29 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
             throw th;
         }
         finally {
-
-            if(resultSet != null) resultSet.close();
-            if(statement != null) statement.close();
-
             dbConnectionProvider.releaseConnection(con);
         }
-
-        return account;
     }
+
+    private @Nullable Account getAccountInternal(@Nonnull final Connection con, @Nonnull final Long id, final boolean forUpdate) throws SQLException {
+
+        try (@Nonnull final PreparedStatement statement = con.prepareStatement(forUpdate ? getByIdSqlForUp : getByIdSql)) {
+
+            statement.setLong(1, id);
+
+            try (@Nonnull final ResultSet resultSet = statement.executeQuery()) {
+
+                if(resultSet.next()) {
+                    final long readId = resultSet.getLong(1);
+                    final String readCurrency = resultSet.getString(2);
+                    final double readAmount = resultSet.getDouble(3);
+
+                    return new Account(readId, readCurrency, new BigDecimal(readAmount));
+                }
+            }
+        }
+
+        return null;
+    }
+
 }
