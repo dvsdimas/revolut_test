@@ -1,5 +1,7 @@
 package com.revolut.dmylnev.services;
 
+import com.revolut.dmylnev.business.exceptions.BusinessException;
+import com.revolut.dmylnev.business.exceptions.NotEnoughMoneyException;
 import com.revolut.dmylnev.database.DbConnectionProvider;
 import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.entity.Activity;
@@ -101,7 +103,8 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
         }
     }
 
-    public @Nonnull Activity deposit(final long id, @Nonnull final String currency, final double amount) throws SQLException {
+    @Override
+    public @Nonnull Activity deposit(final long id, @Nonnull final String currency, final double amount) throws SQLException, BusinessException {
 
         if(Math.abs(amount) < EPS) throw new SQLException("Amount less than 1 cent " + amount);
 
@@ -115,6 +118,10 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
 
             if(account == null) throw new SQLException("Cannot found account with id " + id);
             if(!account.currency.equals(currency)) throw new SQLException("Account currency is not the same as deposit " + currency);
+
+            if( (amount < 0) && (account.amount < Math.abs(amount)) ) {
+                throw new NotEnoughMoneyException(account.id, account.amount, Math.abs(amount));
+            }
 
             final long activityId = insertActivity(con, (amount > 0) ? ActivityType.DEPOSIT : ActivityType.WITHDRAWAL,
                                                    account.id, account.currency, amount, null);
@@ -149,9 +156,9 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
                 if(resultSet.next()) {
 
                     return new Account(resultSet.getLong(1),
-                            resultSet.getString(2),
-                            resultSet.getDouble(3),
-                            resultSet.getLong(4));
+                                       resultSet.getString(2),
+                                       resultSet.getDouble(3),
+                                       resultSet.getLong(4));
                 }
             }
         }

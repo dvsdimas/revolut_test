@@ -1,5 +1,6 @@
 package com.revolut.dmylnev.test.base;
 
+import com.revolut.dmylnev.business.exceptions.NotEnoughMoneyException;
 import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.entity.Activity;
 import com.revolut.dmylnev.rest.jetty.JettyFactory;
@@ -173,18 +174,24 @@ public class BaseRestTest extends BaseDBTest {
 
             final ContentResponse contentResponse = httpClient.POST(withdrawal + "/" + id).content(new FormContentProvider(fields)).send();
 
+            final String content = contentResponse.getContentAsString();
+
             if(contentResponse.getStatus() != HttpServletResponse.SC_OK) {
-                log.error("deposit error {}, {}", contentResponse.getStatus(), contentResponse.getContentAsString());
+
+                if(contentResponse.getStatus() == HttpServletResponse.SC_CONFLICT) {
+                    if(content.contains(NotEnoughMoneyException.msg)) throw NotEnoughMoneyException.fromJson(content);
+                }
+
+                log.error("deposit error {}, {}", contentResponse.getStatus(), content);
+
                 throw new IllegalStateException(contentResponse.getContentAsString());
             }
 
-            final String response = contentResponse.getContentAsString();
+            Assert.assertNotNull(content);
 
-            Assert.assertNotNull(response);
+            log.info(content);
 
-            log.info(response);
-
-            return Activity.fromJson(response);
+            return Activity.fromJson(content);
 
         } finally {
             httpClient.stop();

@@ -1,5 +1,6 @@
 package com.revolut.dmylnev.rest.jetty.servlets;
 
+import com.revolut.dmylnev.business.exceptions.BusinessException;
 import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.entity.Activity;
 import com.revolut.dmylnev.services.ServicesProvider;
@@ -74,9 +75,17 @@ public class WithdrawalServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().print(json);
 
-        } catch (Throwable th) {
+        }
+        catch (BusinessException bex) {
 
-            log.error("deposit error", th);
+            log.warn("withdrawal error", bex);
+
+            resp.setStatus(HttpServletResponse.SC_CONFLICT);
+            resp.getWriter().print(bex.toJson());
+        }
+        catch (Throwable th) {
+
+            log.error("withdrawal error", th);
 
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().print(th.getMessage());

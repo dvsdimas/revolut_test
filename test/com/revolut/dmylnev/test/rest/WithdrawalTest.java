@@ -1,5 +1,6 @@
 package com.revolut.dmylnev.test.rest;
 
+import com.revolut.dmylnev.business.exceptions.NotEnoughMoneyException;
 import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.entity.Activity;
 import com.revolut.dmylnev.entity.ActivityType;
@@ -21,7 +22,7 @@ public class WithdrawalTest extends BaseRestTest {
     private static final Logger log = LogManager.getLogger(WithdrawalTest.class);
 
     @Test
-    public void depositTest() throws Exception {
+    public void withdrawalTest() throws Exception {
 
         @Nonnull final String currency = "USD";
 
@@ -126,6 +127,38 @@ public class WithdrawalTest extends BaseRestTest {
         @Nonnull final Activity activity = restDepositAccount(account.id, account.currency, 0.001);
 
         Assert.assertNotNull(activity);
+    }
+
+    @Test(expected = NotEnoughMoneyException.class)
+    public void withdrawalNotEnoughMoneyTest() throws Exception {
+
+        @Nonnull final Account account = restCreateAccount("USD");
+
+        Assert.assertNotNull(account);
+
+        //--------------------------------------------------------------------------------------------------------------
+
+        final double amount = .01;
+
+        @Nonnull final Activity activity = restDepositAccount(account.id, account.currency, amount);
+
+        Assert.assertNotNull(activity);
+
+        Assert.assertEquals(amount, activity.amount, DELTA);
+
+        //--------------------------------------------------------------------------------------------------------------
+
+        @Nullable final Account accountAfter = restGetAccount(account.id);
+
+        Assert.assertNotNull(accountAfter);
+
+        Assert.assertEquals(amount, accountAfter.amount, DELTA);
+
+        //--------------------------------------------------------------------------------------------------------------
+
+        final double amountWithdrawal = .2;
+
+        restWithdrawalAccount(account.id, account.currency, amountWithdrawal);
     }
 
 }

@@ -74,7 +74,8 @@ public class DepositServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().print(json);
 
-        } catch (Throwable th) {
+        }
+        catch (Throwable th) {
 
             log.error("deposit error", th);
 
