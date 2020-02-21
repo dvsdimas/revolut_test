@@ -35,6 +35,7 @@ public class BaseRestTest extends BaseDBTest {
     private static final String base = host + port;
     private static final String account = base + "/account";
     private static final String deposit = base + "/deposit";
+    private static final String withdrawal = base + "/withdrawal";
 
     @BeforeClass
     public static void init() throws Exception {
@@ -136,6 +137,41 @@ public class BaseRestTest extends BaseDBTest {
             fields.put(Account.PARAM_AMOUNT, String.valueOf(amount));
 
             final ContentResponse contentResponse = httpClient.POST(deposit + "/" + id).content(new FormContentProvider(fields)).send();
+
+            if(contentResponse.getStatus() != HttpServletResponse.SC_OK) {
+                log.error("deposit error {}, {}", contentResponse.getStatus(), contentResponse.getContentAsString());
+                throw new IllegalStateException(contentResponse.getContentAsString());
+            }
+
+            final String response = contentResponse.getContentAsString();
+
+            Assert.assertNotNull(response);
+
+            log.info(response);
+
+            return Activity.fromJson(response);
+
+        } finally {
+            httpClient.stop();
+        }
+    }
+
+    public static @Nonnull Activity restWithdrawalAccount(final long id, @Nonnull final String currency, final double amount) throws Exception {
+
+        Objects.requireNonNull(currency);
+
+        @Nonnull final HttpClient httpClient = new HttpClient();
+
+        try {
+
+            httpClient.start();
+
+            @Nonnull final Fields fields = new Fields();
+
+            fields.put(Account.PARAM_CURRENCY, currency);
+            fields.put(Account.PARAM_AMOUNT, String.valueOf(amount));
+
+            final ContentResponse contentResponse = httpClient.POST(withdrawal + "/" + id).content(new FormContentProvider(fields)).send();
 
             if(contentResponse.getStatus() != HttpServletResponse.SC_OK) {
                 log.error("deposit error {}, {}", contentResponse.getStatus(), contentResponse.getContentAsString());

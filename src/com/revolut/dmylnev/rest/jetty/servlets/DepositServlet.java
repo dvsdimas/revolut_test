@@ -54,7 +54,7 @@ public class DepositServlet extends HttpServlet {
 
             if (amount < 0) {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                resp.getWriter().println("For deposit amount most be more than zero!");
+                resp.getWriter().println("amount must be more than zero!");
                 return;
             }
 
@@ -68,7 +68,7 @@ public class DepositServlet extends HttpServlet {
 
             @Nonnull final String json = activity.toJson();
 
-            log.info("Created deposit [{}]", json);
+            log.info("Deposit has been made [{}]", json);
 
             resp.setContentType("application/json");
             resp.setStatus(HttpServletResponse.SC_OK);
