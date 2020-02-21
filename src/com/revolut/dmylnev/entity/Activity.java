@@ -17,21 +17,21 @@ public class Activity {
     public @Nonnull final String currency;
     public final double amount;
     public final long account;
-    public @Nullable final Long target;
+    public @Nullable final Long counterpart;
 
     public Activity(final long id,
                     @Nonnull final ActivityType type,
                     @Nonnull final String currency,
                     final double amount,
                     final long account,
-                    @Nullable final Long target) {
+                    @Nullable final Long counterpart) {
 
         this.id = id;
         this.type = Objects.requireNonNull(type);
         this.currency = Objects.requireNonNull(currency);
         this.amount = amount;
         this.account = account;
-        this.target = target;
+        this.counterpart = counterpart;
     }
 
     public @Nonnull String toJson() {
@@ -61,12 +61,12 @@ public class Activity {
                 account == activity.account &&
                 type == activity.type &&
                 Double.compare(activity.amount, amount) == 0 &&
-                Objects.equals(target, activity.target) &&
+                Objects.equals(counterpart, activity.counterpart) &&
                 currency.equals(activity.currency);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, currency, amount, account, target);
+        return Objects.hash(id, type, currency, amount, account, counterpart);
     }
 }

@@ -44,7 +44,7 @@ public class DepositTest extends BaseRestTest {
         Assert.assertEquals(account.currency, activity.currency);
         Assert.assertEquals(amount, activity.amount, DELTA);
         Assert.assertEquals(ActivityType.DEPOSIT, activity.type);
-        Assert.assertNull(activity.target);
+        Assert.assertNull(activity.counterpart);
 
         //--------------------------------------------------------------------------------------------------------------
 

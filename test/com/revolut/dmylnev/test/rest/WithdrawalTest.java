@@ -44,7 +44,7 @@ public class WithdrawalTest extends BaseRestTest {
         Assert.assertEquals(account.currency, activity.currency);
         Assert.assertEquals(amount, activity.amount, DELTA);
         Assert.assertEquals(ActivityType.DEPOSIT, activity.type);
-        Assert.assertNull(activity.target);
+        Assert.assertNull(activity.counterpart);
 
         //--------------------------------------------------------------------------------------------------------------
 
@@ -69,7 +69,7 @@ public class WithdrawalTest extends BaseRestTest {
         Assert.assertEquals(account.currency, activityW.currency);
         Assert.assertEquals(-amountWithdrawal, activityW.amount, DELTA);
         Assert.assertEquals(ActivityType.WITHDRAWAL, activityW.type);
-        Assert.assertNull(activityW.target);
+        Assert.assertNull(activityW.counterpart);
 
         //--------------------------------------------------------------------------------------------------------------
 

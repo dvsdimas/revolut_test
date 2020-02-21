@@ -27,7 +27,7 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
     private static @Nonnull final String getByIdSqlForUp = getByIdSql + " FOR UPDATE";
     private static @Nonnull final String createAccountSql = "INSERT INTO accounts (currency) VALUES (?)";
     private static @Nonnull final String updateAccountSql = "UPDATE accounts SET amount = ?, version = ? WHERE id = ?";
-    private static @Nonnull final String insertActivitySql = "INSERT INTO activities (type, currency, amount, account, target) VALUES (?, ?, ?, ?, ?)";
+    private static @Nonnull final String insertActivitySql = "INSERT INTO activities (type, currency, amount, account, counterpart) VALUES (?, ?, ?, ?, ?)";
 
     public AccountServiceImpl(@Nonnull DbConnectionProvider dbConnectionProvider) {
         super(dbConnectionProvider);
