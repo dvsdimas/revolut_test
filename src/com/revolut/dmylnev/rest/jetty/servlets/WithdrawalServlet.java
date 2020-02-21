@@ -26,9 +26,7 @@ public class WithdrawalServlet extends HttpServlet {
 
         try {
 
-            @Nonnull final String strId = req.getPathInfo().substring(1);
-
-            final long id = Long.parseLong(strId);
+            final long id = Long.parseLong(req.getPathInfo().substring(1));
 
 
             final String[] ca = req.getParameterValues(Account.PARAM_CURRENCY);
