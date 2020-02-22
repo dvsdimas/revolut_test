@@ -6,5 +6,5 @@ package com.revolut.dmylnev.entity;
  */
 
 public enum ActivityType {
-    DEPOSIT, WITHDRAWAL, TRANSFER
+    DEPOSIT, WITHDRAWAL, TRANSFER_FROM, TRANSFER_TO
 }

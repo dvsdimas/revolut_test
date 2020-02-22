@@ -12,6 +12,8 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author dmylnev
@@ -137,6 +139,64 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
 
         } catch (Throwable th) {
             log.error("deposit error", th);
+            con.rollback();
+            throw th;
+        }
+        finally {
+            dbConnectionProvider.releaseConnection(con);
+        }
+    }
+
+    @Override
+    public @Nonnull List<Activity> transfer(final long from, final long to, @Nonnull final String currency, final double amount) throws SQLException, BusinessException {
+
+        if(amount < 0) throw new SQLException("Amount must be positive " + amount);
+        if(amount < EPS) throw new SQLException("Amount less than 1 cent " + amount);
+
+        // todo if equal id ????????
+
+        @Nonnull final Connection con = dbConnectionProvider.getConnection();
+
+        try {
+
+            con.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+
+            @Nullable Account accountFrom;
+            @Nullable Account accountTo;
+
+            if(from < to) { // lock at first account with less id for preventing deadlock !!!
+                accountFrom = getAccountInternal(con, from, true);
+                accountTo   = getAccountInternal(con, to, true);
+            } else {
+                accountTo   = getAccountInternal(con, to, true);
+                accountFrom = getAccountInternal(con, from, true);
+            }
+
+            if(accountFrom == null) throw new SQLException("todo from"); // todo
+            if(accountTo == null) throw new SQLException("todo to");   // todo
+
+            if(!accountFrom.currency.equals(currency)) throw new SQLException("Account currency is not the same as " + currency); // todo
+            if(!accountTo.currency.equals(currency)) throw new SQLException("Account currency is not the same as " + currency); // todo
+
+            if(accountFrom.amount < amount) throw new NotEnoughMoneyException(accountFrom.id, accountFrom.amount, Math.abs(amount));
+
+            final long activityFrom = insertActivity(con, ActivityType.TRANSFER_FROM, from, currency, -amount, to);
+            final long activityTo = insertActivity(con, ActivityType.TRANSFER_TO, to, currency, amount, from);
+
+            updateAccount(con, from, accountFrom.amount - amount, activityFrom);
+            updateAccount(con, to, accountTo.amount + amount, activityTo);
+
+            con.commit();
+
+            @Nonnull final List<Activity> result = new ArrayList<>(2);
+
+            result.add(0, new Activity(activityFrom, ActivityType.TRANSFER_FROM, currency, -amount, from, to));
+            result.add(1, new Activity(activityTo, ActivityType.TRANSFER_TO, currency, amount, to, from));
+
+            return result;
+
+        } catch (Throwable th) {
+            log.error("transfer error", th);
             con.rollback();
             throw th;
         }

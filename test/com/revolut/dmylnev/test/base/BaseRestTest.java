@@ -1,5 +1,6 @@
 package com.revolut.dmylnev.test.base;
 
+import com.google.gson.Gson;
 import com.revolut.dmylnev.business.exceptions.NotEnoughMoneyException;
 import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.entity.Activity;
@@ -17,7 +18,7 @@ import org.junit.BeforeClass;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author dmylnev
@@ -37,6 +38,7 @@ public class BaseRestTest extends BaseDBTest {
     private static final String account = base + "/account";
     private static final String deposit = base + "/deposit";
     private static final String withdrawal = base + "/withdrawal";
+    private static final String transfer = base + "/transfer";
 
     @BeforeClass
     public static void init() throws Exception {
@@ -192,6 +194,56 @@ public class BaseRestTest extends BaseDBTest {
             log.info(content);
 
             return Activity.fromJson(content);
+
+        } finally {
+            httpClient.stop();
+        }
+    }
+
+    public static @Nonnull List<Activity> restTransferAccount(final long from, final long to, @Nonnull final String currency, final double amount) throws Exception {
+
+        Objects.requireNonNull(currency);
+
+        @Nonnull final HttpClient httpClient = new HttpClient();
+
+        try {
+
+            httpClient.start();
+
+            @Nonnull final Fields fields = new Fields();
+
+            fields.put(Account.PARAM_FROM, String.valueOf(from));
+            fields.put(Account.PARAM_TO, String.valueOf(to));
+            fields.put(Account.PARAM_CURRENCY, currency);
+            fields.put(Account.PARAM_AMOUNT, String.valueOf(amount));
+
+            final ContentResponse contentResponse = httpClient.POST(transfer).content(new FormContentProvider(fields)).send();
+
+            final String content = contentResponse.getContentAsString();
+
+            if(contentResponse.getStatus() != HttpServletResponse.SC_OK) {
+
+                if(contentResponse.getStatus() == HttpServletResponse.SC_CONFLICT) {
+                    if(content.contains(NotEnoughMoneyException.msg)) throw NotEnoughMoneyException.fromJson(content);
+                }
+
+                log.error("deposit error {}, {}", contentResponse.getStatus(), content);
+
+                throw new IllegalStateException(contentResponse.getContentAsString());
+            }
+
+            Assert.assertNotNull(content);
+
+            log.info(content);
+
+            @Nonnull final Map<String, String> map = new Gson().fromJson(content, HashMap.class);
+
+            @Nonnull final ArrayList<Activity> list = new ArrayList<>(2);
+
+            list.add(0, Activity.fromJson(map.get("from")));
+            list.add(1, Activity.fromJson(map.get("to")));
+
+            return list;
 
         } finally {
             httpClient.stop();

@@ -6,6 +6,7 @@ import com.revolut.dmylnev.entity.Activity;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * @author dmylnev
@@ -19,5 +20,7 @@ public interface IAccountService {
     @Nullable Account getAccount(@Nonnull final Long id) throws SQLException;
 
     @Nonnull Activity deposit(final long id, @Nonnull final String currency, final double amount) throws SQLException, BusinessException;
+
+    @Nonnull List<Activity> transfer(final long from, final long to, @Nonnull final String currency, final double amount) throws SQLException, BusinessException;
 
 }

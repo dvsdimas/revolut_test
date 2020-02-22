@@ -13,6 +13,8 @@ public final class Account {
 
     public static @Nonnull final String PARAM_CURRENCY = "currency";
     public static @Nonnull final String PARAM_AMOUNT = "amount";
+    public static @Nonnull final String PARAM_FROM = "from";
+    public static @Nonnull final String PARAM_TO = "to";
 
     public final long id;
     public @Nonnull final String currency;
@@ -59,8 +61,7 @@ public final class Account {
 
         @Nonnull final Account account = new Gson().fromJson(json, Account.class);
 
-        if( (account.id == 0) || (account.currency == null) )
-            throw new IllegalArgumentException(json);
+        if( (account.id == 0) || (account.currency == null) ) throw new IllegalArgumentException(json);
 
         return account;
     }
