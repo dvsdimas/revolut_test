@@ -63,7 +63,7 @@ public class WithdrawalServlet extends HttpServlet {
                 return;
             }
 
-            @Nonnull final Activity activity = ServicesProvider.getAccountService().deposit(id, currency, -amount);
+            @Nonnull final Activity activity = ServicesProvider.getAccountService().withdrawal(id, currency, amount);
 
             @Nonnull final String json = activity.toJson();
 

@@ -21,6 +21,8 @@ public interface IAccountService {
 
     @Nonnull Activity deposit(final long id, @Nonnull final String currency, final double amount) throws SQLException, BusinessException;
 
+    @Nonnull Activity withdrawal(final long id, @Nonnull final String currency, final double amount) throws SQLException, BusinessException;
+
     @Nonnull List<Activity> transfer(final long from, final long to, @Nonnull final String currency, final double amount) throws SQLException, BusinessException;
 
 }

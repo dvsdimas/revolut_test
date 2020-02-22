@@ -106,6 +106,11 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
     }
 
     @Override
+    public @Nonnull Activity withdrawal(final long id, @Nonnull final String currency, final double amount) throws SQLException, BusinessException {
+        return deposit(id, currency, -amount);
+    }
+
+    @Override
     public @Nonnull Activity deposit(final long id, @Nonnull final String currency, final double amount) throws SQLException, BusinessException {
 
         if(Math.abs(amount) < EPS) throw new SQLException("Amount less than 1 cent " + amount);
