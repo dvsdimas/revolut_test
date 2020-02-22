@@ -112,7 +112,7 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
     @Override
     public @Nonnull Activity deposit(final long id, @Nonnull final String currency, final double amount) throws SQLException, BusinessException {
 
-        if(Math.abs(amount) < EPS) throw new SQLException("Amount less than 1 cent " + amount);
+        if(Math.abs(amount) < EPS) throw new SmallAmountException(amount);
 
         @Nonnull final Connection con = dbConnectionProvider.getConnection();
 
@@ -157,8 +157,8 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
 
         if(from == to) throw new SameAccountTransferException(from);
 
-        if(amount < 0) throw new SQLException("Amount must be positive " + amount);
-        if(amount < EPS) throw new SQLException("Amount less than 1 cent " + amount);
+        if(amount < 0) throw new IllegalArgumentException("Amount must be positive " + amount);
+        if(amount < EPS) throw new SmallAmountException(amount);
 
         @Nonnull final Connection con = dbConnectionProvider.getConnection();
 

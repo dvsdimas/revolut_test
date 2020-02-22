@@ -3,6 +3,7 @@ package com.revolut.dmylnev.test.rest;
 import com.revolut.dmylnev.business.exceptions.AccountNotFoundException;
 import com.revolut.dmylnev.business.exceptions.DifferentCurrenciesException;
 import com.revolut.dmylnev.business.exceptions.SameAccountTransferException;
+import com.revolut.dmylnev.business.exceptions.SmallAmountException;
 import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.entity.Activity;
 import com.revolut.dmylnev.entity.ActivityType;
@@ -173,6 +174,18 @@ public class TransferTest extends BaseRestTest {
         Assert.assertNotNull(accountTo);
 
         restTransferAccounts(accountFrom.id, accountTo.id, currency, 1d);
+    }
+
+    @Test(expected = SmallAmountException.class)
+    public void transferSmallAmountTest() throws Exception {
+
+        @Nonnull final Account accountFrom = restCreateAccount(currency);
+        @Nonnull final Account accountTo = restCreateAccount(currency);
+
+        Assert.assertNotNull(accountFrom);
+        Assert.assertNotNull(accountTo);
+
+        restTransferAccounts(accountFrom.id, accountTo.id, currency, 0.001);
     }
 
 }

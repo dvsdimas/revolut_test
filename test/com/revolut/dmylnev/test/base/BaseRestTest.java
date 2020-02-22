@@ -224,6 +224,7 @@ public class BaseRestTest extends BaseDBTest {
             if(content.contains(AccountNotFoundException.msg))     throw AccountNotFoundException.fromJson(content);
             if(content.contains(SameAccountTransferException.msg)) throw SameAccountTransferException.fromJson(content);
             if(content.contains(DifferentCurrenciesException.msg)) throw DifferentCurrenciesException.fromJson(content);
+            if(content.contains(SmallAmountException.msg))         throw SmallAmountException.fromJson(content);
         }
 
         log.error("status {}, content: {}", status, content);

@@ -56,12 +56,6 @@ public class DepositServlet extends HttpServlet {
                 return;
             }
 
-            if (amount < 0.01) {
-                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                resp.getWriter().println("Deposit must be more than 1 cent!");
-                return;
-            }
-
             @Nonnull final Activity activity = ServicesProvider.getAccountService().deposit(id, currency, amount);
 
             @Nonnull final String json = activity.toJson();

@@ -87,12 +87,6 @@ public class TransferServlet extends HttpServlet {
                 return;
             }
 
-            if (amount < 0.01) {
-                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                resp.getWriter().println("Deposit must be more than 1 cent!");
-                return;
-            }
-
             @Nonnull final List<Activity> result = ServicesProvider.getAccountService().transfer(from, to, currency, amount);
 
             @Nonnull final Map<String, String> map = new HashMap<>();

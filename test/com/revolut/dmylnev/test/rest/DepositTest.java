@@ -2,6 +2,7 @@ package com.revolut.dmylnev.test.rest;
 
 import com.revolut.dmylnev.business.exceptions.AccountNotFoundException;
 import com.revolut.dmylnev.business.exceptions.DifferentCurrenciesException;
+import com.revolut.dmylnev.business.exceptions.SmallAmountException;
 import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.entity.Activity;
 import com.revolut.dmylnev.entity.ActivityType;
@@ -65,20 +66,6 @@ public class DepositTest extends BaseRestTest {
         Assert.assertNotNull(activity);
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void depositFail3Test() throws Exception {
-
-        @Nonnull final Account account = restCreateAccount(currency);
-
-        Assert.assertNotNull(account);
-
-        //--------------------------------------------------------------------------------------------------------------
-
-        @Nonnull final Activity activity = restDepositAccount(account.id, account.currency, 0.001);
-
-        Assert.assertNotNull(activity);
-    }
-
     @Test(expected = AccountNotFoundException.class)
     public void depositAccountNotFoundTest() throws Exception {
         restDepositAccount(3232323, currency, 1d);
@@ -95,6 +82,19 @@ public class DepositTest extends BaseRestTest {
         //--------------------------------------------------------------------------------------------------------------
 
         restDepositAccount(account.id, "EUR", 1_000_000);
+    }
+
+    @Test(expected = SmallAmountException.class)
+    public void depositSmallAmountTest() throws Exception {
+
+        @Nonnull final Account account = restCreateAccount(currency);
+
+        Assert.assertNotNull(account);
+        Assert.assertEquals(currency, account.currency);
+
+        //--------------------------------------------------------------------------------------------------------------
+
+        restDepositAccount(account.id, currency, 0.001);
     }
 
 }
