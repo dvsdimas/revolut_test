@@ -1,0 +1,46 @@
+package com.revolut.dmylnev.business.exceptions;
+
+import com.google.gson.Gson;
+import javax.annotation.Nonnull;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * @author dmylnev
+ * @since 22.02.2020
+ */
+
+public class SameAccountTransferException extends BusinessException {
+
+    public static @Nonnull final String msg = "Transfer must be performed between to different accounts";
+
+    private final long accountId;
+
+    public SameAccountTransferException(final long accountId) {
+        this.accountId = accountId;
+    }
+
+    @Override
+    public @Nonnull String toJson() {
+
+        @Nonnull final Map<String, String> map = new HashMap<>();
+
+        map.put(PARAM_REASON, msg);
+        map.put(PARAM_ACCOUNT_ID, String.valueOf(accountId));
+
+        return new Gson().toJson(map);
+    }
+
+    public static @Nonnull SameAccountTransferException fromJson(@Nonnull String json) {
+
+        @Nonnull final Map<String, String> map = new Gson().fromJson(json, Map.class);
+
+        return new SameAccountTransferException(Long.parseLong(map.get(PARAM_ACCOUNT_ID)));
+    }
+
+    @Override
+    public String toString() {
+        return toJson();
+    }
+
+}

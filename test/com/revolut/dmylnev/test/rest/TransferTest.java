@@ -1,6 +1,7 @@
 package com.revolut.dmylnev.test.rest;
 
 import com.revolut.dmylnev.business.exceptions.AccountNotFoundException;
+import com.revolut.dmylnev.business.exceptions.SameAccountTransferException;
 import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.entity.Activity;
 import com.revolut.dmylnev.entity.ActivityType;
@@ -140,6 +141,9 @@ public class TransferTest extends BaseRestTest {
         restTransferAccount(323239999, accountTo.id, currency, 1d);
     }
 
-
+    @Test(expected = SameAccountTransferException.class)
+    public void transferSameAccountTransferTest() throws Exception {
+        restTransferAccount(123456, 123456, "USD", 1d);
+    }
 
 }

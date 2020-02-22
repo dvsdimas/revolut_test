@@ -3,6 +3,7 @@ package com.revolut.dmylnev.services;
 import com.revolut.dmylnev.business.exceptions.AccountNotFoundException;
 import com.revolut.dmylnev.business.exceptions.BusinessException;
 import com.revolut.dmylnev.business.exceptions.NotEnoughMoneyException;
+import com.revolut.dmylnev.business.exceptions.SameAccountTransferException;
 import com.revolut.dmylnev.database.DbConnectionProvider;
 import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.entity.Activity;
@@ -154,12 +155,13 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
     }
 
     @Override
-    public @Nonnull List<Activity> transfer(final long from, final long to, @Nonnull final String currency, final double amount) throws SQLException, BusinessException {
+    public @Nonnull List<Activity> transfer(final long from, final long to, @Nonnull final String currency, final double amount)
+            throws SQLException, BusinessException {
+
+        if(from == to) throw new SameAccountTransferException(from);
 
         if(amount < 0) throw new SQLException("Amount must be positive " + amount);
         if(amount < EPS) throw new SQLException("Amount less than 1 cent " + amount);
-
-        // todo if equal id ????????
 
         @Nonnull final Connection con = dbConnectionProvider.getConnection();
 
