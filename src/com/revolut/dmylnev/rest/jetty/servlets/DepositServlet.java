@@ -7,81 +7,66 @@ import com.revolut.dmylnev.services.ServicesProvider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import javax.annotation.Nonnull;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * @author dmylnev
  * @since 20.02.2020
  */
 
-public class DepositServlet extends HttpServlet {
+public class DepositServlet extends BusinessServlet {
 
     private static final Logger log = LogManager.getLogger(DepositServlet.class);
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doPostInternal(HttpServletRequest req, HttpServletResponse resp) throws IOException, SQLException, BusinessException {
 
-        try {
+        final long id = Long.parseLong(req.getPathInfo().substring(1));
 
-            final long id = Long.parseLong(req.getPathInfo().substring(1));
+        final String[] ca = req.getParameterValues(Account.PARAM_CURRENCY);
 
-            final String[] ca = req.getParameterValues(Account.PARAM_CURRENCY);
-
-            if ((ca == null) || ca[0] == null) {
-                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                resp.getWriter().println("Param " + Account.PARAM_CURRENCY + " not found !");
-                return;
-            }
-
-            final String currency = ca[0];
-
-            final String[] aa = req.getParameterValues(Account.PARAM_AMOUNT);
-
-            if ((aa == null) || aa[0] == null) {
-                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                resp.getWriter().println("Param " + Account.PARAM_AMOUNT + " not found !");
-                return;
-            }
-
-            final double amount = Double.parseDouble(aa[0]);
-
-            log.info("Trying to deposit to Account with the id [{}] {} {}", id, amount, currency);
-
-            if (amount < 0) {
-                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                resp.getWriter().println("amount must be more than zero!");
-                return;
-            }
-
-            @Nonnull final Activity activity = ServicesProvider.getAccountService().deposit(id, currency, amount);
-
-            @Nonnull final String json = activity.toJson();
-
-            log.info("Deposit has been made [{}]", json);
-
-            resp.setContentType("application/json");
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.getWriter().print(json);
-
-        }
-        catch (BusinessException bex) {
-
-            log.warn("deposit business error", bex);
-
-            resp.setStatus(HttpServletResponse.SC_CONFLICT);
-            resp.getWriter().print(bex.toJson());
-        }
-        catch (Throwable th) {
-
-            log.error("deposit error", th);
-
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            resp.getWriter().print(th.getMessage());
+        if ((ca == null) || ca[0] == null) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().println("Param " + Account.PARAM_CURRENCY + " not found !");
+            return;
         }
 
+        final String currency = ca[0];
+
+        final String[] aa = req.getParameterValues(Account.PARAM_AMOUNT);
+
+        if ((aa == null) || aa[0] == null) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().println("Param " + Account.PARAM_AMOUNT + " not found !");
+            return;
+        }
+
+        final double amount = Double.parseDouble(aa[0]);
+
+        log.info("Trying to deposit to Account with the id [{}] {} {}", id, amount, currency);
+
+        if (amount < 0) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().println("amount must be more than zero!");
+            return;
+        }
+
+        @Nonnull final Activity activity = ServicesProvider.getAccountService().deposit(id, currency, amount);
+
+        @Nonnull final String json = activity.toJson();
+
+        log.info("Deposit has been made [{}]", json);
+
+        resp.setContentType("application/json");
+        resp.setStatus(HttpServletResponse.SC_OK);
+        resp.getWriter().print(json);
     }
 
+    @Override
+    protected void doGetInternal(HttpServletRequest req, HttpServletResponse resp) {
+        throw new IllegalStateException("doGetInternal has not been implemented");
+    }
 }

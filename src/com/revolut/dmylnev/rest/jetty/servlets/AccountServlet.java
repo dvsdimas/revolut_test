@@ -6,93 +6,75 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * @author dmylnev
  * @since 19.02.2020
  */
 
-public class AccountServlet extends HttpServlet {
+public class AccountServlet extends BusinessServlet {
 
     private static final Logger log = LogManager.getLogger(AccountServlet.class);
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doPostInternal(HttpServletRequest req, HttpServletResponse resp) throws IOException, SQLException {
 
-        try {
+        final String[] ca = req.getParameterValues(Account.PARAM_CURRENCY);
 
-            @Nonnull final String strId = req.getPathInfo().substring(1);
-
-            log.info("Trying to get Account with the id [{}]", strId);
-
-            @Nonnull final Long id = Long.valueOf(strId);
-
-            @Nullable final Account account = ServicesProvider.getAccountService().getAccount(id);
-
-            if(account == null) {
-
-                @Nonnull final String msg = String.format("Account with the id [%d] not found", id);
-
-                log.warn(msg);
-
-                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                resp.getWriter().print(msg);
-
-            } else {
-
-                @Nonnull final String json = account.toJson();
-
-                log.info("Found account [{}]", json);
-
-                resp.setContentType("application/json");
-                resp.setStatus(HttpServletResponse.SC_OK);
-                resp.getWriter().print(json);
-            }
-        } catch (Throwable th) {
-
-            log.error("get account by id error", th);
-
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            resp.getWriter().print(th.getMessage());
+        if ((ca == null) || ca[0] == null) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().println("Param " + Account.PARAM_CURRENCY + " not found !");
+            return;
         }
+
+        final String currency = ca[0];
+
+        log.info("Creating account with currency [{}]", currency);
+
+        @Nonnull final Account account = ServicesProvider.getAccountService().createAccount(currency);
+
+        @Nonnull final String json = account.toJson();
+
+        log.info("Created new account [{}]", json);
+
+        resp.setContentType("application/json");
+        resp.setStatus(HttpServletResponse.SC_OK);
+        resp.getWriter().print(json);
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doGetInternal(HttpServletRequest req, HttpServletResponse resp) throws IOException, SQLException {
 
-        try {
-            final String[] ca = req.getParameterValues(Account.PARAM_CURRENCY);
+        @Nonnull final String strId = req.getPathInfo().substring(1);
 
-            if ((ca == null) || ca[0] == null) {
-                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                resp.getWriter().println("Param " + Account.PARAM_CURRENCY + " not found !");
-                return;
-            }
+        log.info("Trying to get Account with the id [{}]", strId);
 
-            final String currency = ca[0];
+        @Nonnull final Long id = Long.valueOf(strId);
 
-            log.info("Creating account with currency [{}]", currency);
+        @Nullable final Account account = ServicesProvider.getAccountService().getAccount(id);
 
-            @Nonnull final Account account = ServicesProvider.getAccountService().createAccount(currency);
+        if(account == null) {
+
+            @Nonnull final String msg = String.format("Account with the id [%d] not found", id);
+
+            log.warn(msg);
+
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            resp.getWriter().print(msg);
+
+        } else {
 
             @Nonnull final String json = account.toJson();
 
-            log.info("Created new account [{}]", json);
+            log.info("Found account [{}]", json);
 
             resp.setContentType("application/json");
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().print(json);
-
-        } catch (Throwable th) {
-
-            log.error("create account error", th);
-
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            resp.getWriter().print(th.getMessage());
         }
     }
 
