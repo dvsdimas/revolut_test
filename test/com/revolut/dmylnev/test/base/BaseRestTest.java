@@ -1,6 +1,8 @@
 package com.revolut.dmylnev.test.base;
 
 import com.google.gson.Gson;
+import com.revolut.dmylnev.business.exceptions.AccountNotFoundException;
+import com.revolut.dmylnev.business.exceptions.BusinessException;
 import com.revolut.dmylnev.business.exceptions.NotEnoughMoneyException;
 import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.entity.Activity;
@@ -76,18 +78,13 @@ public class BaseRestTest extends BaseDBTest {
 
             final ContentResponse contentResponse = httpClient.POST(account).content(new FormContentProvider(fields)).send();
 
-            if(contentResponse.getStatus() != HttpServletResponse.SC_OK) {
-                log.error("create account error {}, {}", contentResponse.getStatus(), contentResponse.getContentAsString());
-                throw new IllegalStateException(contentResponse.getContentAsString());
-            }
+            final String content = contentResponse.getContentAsString();
+            Assert.assertNotNull(content);
+            log.info(content);
 
-            final String response = contentResponse.getContentAsString();
+            if(contentResponse.getStatus() != HttpServletResponse.SC_OK) handleErrors(contentResponse.getStatus(), content);
 
-            Assert.assertNotNull(response);
-
-            log.info(response);
-
-            return Account.fromJson(response);
+            return Account.fromJson(content);
 
         } finally {
             httpClient.stop();
@@ -106,18 +103,13 @@ public class BaseRestTest extends BaseDBTest {
 
             if(contentResponse.getStatus() == HttpServletResponse.SC_NOT_FOUND) return null;
 
-            if(contentResponse.getStatus() != HttpServletResponse.SC_OK) {
-                log.error("get account error {}, {}", contentResponse.getStatus(), contentResponse.getContentAsString());
-                throw new IllegalStateException(contentResponse.getContentAsString());
-            }
+            final String content = contentResponse.getContentAsString();
+            Assert.assertNotNull(content);
+            log.info(content);
 
-            final String response = contentResponse.getContentAsString();
+            if(contentResponse.getStatus() != HttpServletResponse.SC_OK) handleErrors(contentResponse.getStatus(), content);
 
-            Assert.assertNotNull(response);
-
-            log.info(response);
-
-            return Account.fromJson(response);
+            return Account.fromJson(content);
 
         } finally {
             httpClient.stop();
@@ -141,18 +133,13 @@ public class BaseRestTest extends BaseDBTest {
 
             final ContentResponse contentResponse = httpClient.POST(deposit + "/" + id).content(new FormContentProvider(fields)).send();
 
-            if(contentResponse.getStatus() != HttpServletResponse.SC_OK) {
-                log.error("deposit error {}, {}", contentResponse.getStatus(), contentResponse.getContentAsString());
-                throw new IllegalStateException(contentResponse.getContentAsString());
-            }
+            final String content = contentResponse.getContentAsString();
+            Assert.assertNotNull(content);
+            log.info(content);
 
-            final String response = contentResponse.getContentAsString();
+            if(contentResponse.getStatus() != HttpServletResponse.SC_OK) handleErrors(contentResponse.getStatus(), content);
 
-            Assert.assertNotNull(response);
-
-            log.info(response);
-
-            return Activity.fromJson(response);
+            return Activity.fromJson(content);
 
         } finally {
             httpClient.stop();
@@ -178,20 +165,11 @@ public class BaseRestTest extends BaseDBTest {
 
             final String content = contentResponse.getContentAsString();
 
-            if(contentResponse.getStatus() != HttpServletResponse.SC_OK) {
-
-                if(contentResponse.getStatus() == HttpServletResponse.SC_CONFLICT) {
-                    if(content.contains(NotEnoughMoneyException.msg)) throw NotEnoughMoneyException.fromJson(content);
-                }
-
-                log.error("deposit error {}, {}", contentResponse.getStatus(), content);
-
-                throw new IllegalStateException(contentResponse.getContentAsString());
-            }
-
             Assert.assertNotNull(content);
 
             log.info(content);
+
+            if(contentResponse.getStatus() != HttpServletResponse.SC_OK) handleErrors(contentResponse.getStatus(), content);
 
             return Activity.fromJson(content);
 
@@ -220,21 +198,10 @@ public class BaseRestTest extends BaseDBTest {
             final ContentResponse contentResponse = httpClient.POST(transfer).content(new FormContentProvider(fields)).send();
 
             final String content = contentResponse.getContentAsString();
-
-            if(contentResponse.getStatus() != HttpServletResponse.SC_OK) {
-
-                if(contentResponse.getStatus() == HttpServletResponse.SC_CONFLICT) {
-                    if(content.contains(NotEnoughMoneyException.msg)) throw NotEnoughMoneyException.fromJson(content);
-                }
-
-                log.error("deposit error {}, {}", contentResponse.getStatus(), content);
-
-                throw new IllegalStateException(contentResponse.getContentAsString());
-            }
-
             Assert.assertNotNull(content);
-
             log.info(content);
+
+            if(contentResponse.getStatus() != HttpServletResponse.SC_OK) handleErrors(contentResponse.getStatus(), content);
 
             @Nonnull final Map<String, String> map = new Gson().fromJson(content, HashMap.class);
 
@@ -248,6 +215,18 @@ public class BaseRestTest extends BaseDBTest {
         } finally {
             httpClient.stop();
         }
+    }
+
+    private static void handleErrors(final int status, @Nonnull final String content) throws BusinessException {
+
+        if(status == HttpServletResponse.SC_CONFLICT) {
+            if(content.contains(NotEnoughMoneyException.msg)) throw NotEnoughMoneyException.fromJson(content);
+            if(content.contains(AccountNotFoundException.msg)) throw AccountNotFoundException.fromJson(content);
+        }
+
+        log.error("status {}, content: {}", status, content);
+
+        throw new IllegalStateException(content);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.revolut.dmylnev.services;
 
+import com.revolut.dmylnev.business.exceptions.AccountNotFoundException;
 import com.revolut.dmylnev.business.exceptions.BusinessException;
 import com.revolut.dmylnev.business.exceptions.NotEnoughMoneyException;
 import com.revolut.dmylnev.database.DbConnectionProvider;
@@ -64,9 +65,9 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
 
             @Nullable final Account account = getAccountInternal(con, id, false);
 
-            con.commit();
-
             if(account == null) throw new SQLException("Cannot insert new account");
+
+            con.commit();
 
             return account;
 
@@ -123,7 +124,7 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
 
             @Nullable final Account account = getAccountInternal(con, id, true);
 
-            if(account == null) throw new SQLException("Cannot found account with id " + id);
+            if(account == null) throw new AccountNotFoundException(id);
             if(!account.currency.equals(currency)) throw new SQLException("Account currency is not the same as deposit " + currency);
 
             if( (amount < 0) && (account.amount < Math.abs(amount)) ) {
@@ -177,8 +178,8 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
                 accountFrom = getAccountInternal(con, from, true);
             }
 
-            if(accountFrom == null) throw new SQLException("todo from"); // todo
-            if(accountTo == null) throw new SQLException("todo to");   // todo
+            if(accountFrom == null) throw new AccountNotFoundException(from);
+            if(accountTo == null) throw new AccountNotFoundException(to);
 
             if(!accountFrom.currency.equals(currency)) throw new SQLException("Account currency is not the same as " + currency); // todo
             if(!accountTo.currency.equals(currency)) throw new SQLException("Account currency is not the same as " + currency); // todo

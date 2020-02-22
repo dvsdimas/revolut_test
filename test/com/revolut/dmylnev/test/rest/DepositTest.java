@@ -1,5 +1,6 @@
 package com.revolut.dmylnev.test.rest;
 
+import com.revolut.dmylnev.business.exceptions.AccountNotFoundException;
 import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.entity.Activity;
 import com.revolut.dmylnev.entity.ActivityType;
@@ -58,16 +59,6 @@ public class DepositTest extends BaseRestTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void depositFail1Test() throws Exception {
-
-        final double amount = 3.33;
-
-        @Nonnull final Activity activity = restDepositAccount(43245, "RUB", amount);
-
-        Assert.assertNotNull(activity);
-    }
-
-    @Test(expected = IllegalStateException.class)
     public void depositFail2Test() throws Exception {
 
         @Nonnull final String currency = "USD";
@@ -101,6 +92,11 @@ public class DepositTest extends BaseRestTest {
         @Nonnull final Activity activity = restDepositAccount(account.id, account.currency, 0.001);
 
         Assert.assertNotNull(activity);
+    }
+
+    @Test(expected = AccountNotFoundException.class)
+    public void depositAccountNotFoundTest() throws Exception {
+        restDepositAccount(3232323, "USD", 1d);
     }
 
 }

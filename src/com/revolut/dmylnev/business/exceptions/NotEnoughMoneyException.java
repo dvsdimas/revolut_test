@@ -46,4 +46,9 @@ public final class NotEnoughMoneyException extends BusinessException {
                                            Double.parseDouble(map.get(PARAM_REQUESTED_AMOUNT))
         );
     }
+
+    @Override
+    public String toString() {
+        return toJson();
+    }
 }

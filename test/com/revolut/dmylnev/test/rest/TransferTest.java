@@ -1,5 +1,6 @@
 package com.revolut.dmylnev.test.rest;
 
+import com.revolut.dmylnev.business.exceptions.AccountNotFoundException;
 import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.entity.Activity;
 import com.revolut.dmylnev.entity.ActivityType;
@@ -109,4 +110,36 @@ public class TransferTest extends BaseRestTest {
         Assert.assertEquals(activityFrom.id, accountFromAfter.version);
         Assert.assertEquals(activityTo.id, accountToAfter.version);
     }
+
+    @Test(expected = AccountNotFoundException.class)
+    public void transferAccountNotFoundTest1() throws Exception {
+        restTransferAccount(32324892, 59202, "USD", 1d);
+    }
+
+    @Test(expected = AccountNotFoundException.class)
+    public void transferAccountNotFoundTest2() throws Exception {
+
+        @Nonnull final String currency = "USD";
+
+        @Nonnull final Account accountFrom = restCreateAccount(currency);
+
+        Assert.assertNotNull(accountFrom);
+
+        restTransferAccount(accountFrom.id, 59202, currency, 1d);
+    }
+
+    @Test(expected = AccountNotFoundException.class)
+    public void transferAccountNotFoundTest3() throws Exception {
+
+        @Nonnull final String currency = "USD";
+
+        @Nonnull final Account accountTo = restCreateAccount(currency);
+
+        Assert.assertNotNull(accountTo);
+
+        restTransferAccount(323239999, accountTo.id, currency, 1d);
+    }
+
+
+
 }

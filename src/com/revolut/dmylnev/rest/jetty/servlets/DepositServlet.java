@@ -1,5 +1,6 @@
 package com.revolut.dmylnev.rest.jetty.servlets;
 
+import com.revolut.dmylnev.business.exceptions.BusinessException;
 import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.entity.Activity;
 import com.revolut.dmylnev.services.ServicesProvider;
@@ -71,6 +72,13 @@ public class DepositServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().print(json);
 
+        }
+        catch (BusinessException bex) {
+
+            log.warn("deposit business error", bex);
+
+            resp.setStatus(HttpServletResponse.SC_CONFLICT);
+            resp.getWriter().print(bex.toJson());
         }
         catch (Throwable th) {
 
