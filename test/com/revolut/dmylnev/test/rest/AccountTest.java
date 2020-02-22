@@ -3,8 +3,6 @@ package com.revolut.dmylnev.test.rest;
 import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.services.ServicesProvider;
 import com.revolut.dmylnev.test.base.BaseRestTest;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import javax.annotation.Nonnull;
@@ -17,8 +15,6 @@ import javax.annotation.Nullable;
 
 public class AccountTest extends BaseRestTest {
 
-    private static final Logger log = LogManager.getLogger(AccountTest.class);
-
     @Test
     public void createAccount() throws Exception {
 
@@ -27,10 +23,6 @@ public class AccountTest extends BaseRestTest {
         Assert.assertNull(nullAccount);
 
         //--------------------------------------------------------------------------------------------------------------
-
-        @Nonnull final String currency = "USD";
-
-        log.info("Creating account with currency [{}]", currency);
 
         @Nonnull final Account createdAccount = restCreateAccount(currency);
 
@@ -52,7 +44,6 @@ public class AccountTest extends BaseRestTest {
         Assert.assertNotNull(accountService);
 
         Assert.assertEquals(accountService, createdAccount);
-
     }
 
 }

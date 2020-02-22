@@ -7,8 +7,6 @@ import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.entity.Activity;
 import com.revolut.dmylnev.entity.ActivityType;
 import com.revolut.dmylnev.test.base.BaseRestTest;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import javax.annotation.Nonnull;
@@ -21,8 +19,6 @@ import java.util.List;
  */
 
 public class TransferTest extends BaseRestTest {
-
-    private static final Logger log = LogManager.getLogger(TransferTest.class);
 
     @Test
     public void transferTest() throws Exception {
@@ -71,7 +67,7 @@ public class TransferTest extends BaseRestTest {
 
         //--------------------------------------------------------------------------------------------------------------
 
-        @Nonnull final List<Activity> activities = restTransferAccount(account.id, accountTo.id, account.currency, amount);
+        @Nonnull final List<Activity> activities = restTransferAccounts(account.id, accountTo.id, account.currency, amount);
 
         Assert.assertNotNull(activities);
 
@@ -115,42 +111,36 @@ public class TransferTest extends BaseRestTest {
 
     @Test(expected = AccountNotFoundException.class)
     public void transferAccountNotFoundTest1() throws Exception {
-        restTransferAccount(32324892, 59202, "USD", 1d);
+        restTransferAccounts(32324892, 59202, currency, 1d);
     }
 
     @Test(expected = AccountNotFoundException.class)
     public void transferAccountNotFoundTest2() throws Exception {
 
-        @Nonnull final String currency = "USD";
-
         @Nonnull final Account accountFrom = restCreateAccount(currency);
 
         Assert.assertNotNull(accountFrom);
 
-        restTransferAccount(accountFrom.id, 59202, currency, 1d);
+        restTransferAccounts(accountFrom.id, 59202, currency, 1d);
     }
 
     @Test(expected = AccountNotFoundException.class)
     public void transferAccountNotFoundTest3() throws Exception {
 
-        @Nonnull final String currency = "USD";
-
         @Nonnull final Account accountTo = restCreateAccount(currency);
 
         Assert.assertNotNull(accountTo);
 
-        restTransferAccount(323239999, accountTo.id, currency, 1d);
+        restTransferAccounts(323239999, accountTo.id, currency, 1d);
     }
 
     @Test(expected = SameAccountTransferException.class)
     public void transferSameAccountTransferTest() throws Exception {
-        restTransferAccount(123456, 123456, "USD", 1d);
+        restTransferAccounts(123456, 123456, currency, 1d);
     }
 
     @Test(expected = DifferentCurrenciesException.class)
     public void transferWrongCurrencyTest1() throws Exception {
-
-        @Nonnull final String currency = "USD";
 
         @Nonnull final Account accountFrom = restCreateAccount(currency);
         @Nonnull final Account accountTo = restCreateAccount(currency);
@@ -158,13 +148,11 @@ public class TransferTest extends BaseRestTest {
         Assert.assertNotNull(accountFrom);
         Assert.assertNotNull(accountTo);
 
-        restTransferAccount(accountFrom.id, accountTo.id, "RUB", 1d);
+        restTransferAccounts(accountFrom.id, accountTo.id, "RUB", 1d);
     }
 
     @Test(expected = DifferentCurrenciesException.class)
     public void transferWrongCurrencyTest2() throws Exception {
-
-        @Nonnull final String currency = "USD";
 
         @Nonnull final Account accountFrom = restCreateAccount("RUB");
         @Nonnull final Account accountTo = restCreateAccount(currency);
@@ -172,13 +160,11 @@ public class TransferTest extends BaseRestTest {
         Assert.assertNotNull(accountFrom);
         Assert.assertNotNull(accountTo);
 
-        restTransferAccount(accountFrom.id, accountTo.id, currency, 1d);
+        restTransferAccounts(accountFrom.id, accountTo.id, currency, 1d);
     }
 
     @Test(expected = DifferentCurrenciesException.class)
     public void transferWrongCurrencyTest3() throws Exception {
-
-        @Nonnull final String currency = "USD";
 
         @Nonnull final Account accountFrom = restCreateAccount(currency);
         @Nonnull final Account accountTo = restCreateAccount("RUB");
@@ -186,7 +172,7 @@ public class TransferTest extends BaseRestTest {
         Assert.assertNotNull(accountFrom);
         Assert.assertNotNull(accountTo);
 
-        restTransferAccount(accountFrom.id, accountTo.id, currency, 1d);
+        restTransferAccounts(accountFrom.id, accountTo.id, currency, 1d);
     }
 
 }

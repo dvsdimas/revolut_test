@@ -6,8 +6,6 @@ import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.entity.Activity;
 import com.revolut.dmylnev.entity.ActivityType;
 import com.revolut.dmylnev.test.base.BaseRestTest;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import javax.annotation.Nonnull;
@@ -20,14 +18,8 @@ import javax.annotation.Nullable;
 
 public class DepositTest extends BaseRestTest {
 
-    private static final Logger log = LogManager.getLogger(DepositTest.class);
-
     @Test
     public void depositTest() throws Exception {
-
-        @Nonnull final String currency = "USD";
-
-        log.info("Creating account with currency [{}]", currency);
 
         @Nonnull final Account account = restCreateAccount(currency);
 
@@ -62,10 +54,6 @@ public class DepositTest extends BaseRestTest {
     @Test(expected = IllegalStateException.class)
     public void depositFail2Test() throws Exception {
 
-        @Nonnull final String currency = "USD";
-
-        log.info("Creating account with currency [{}]", currency);
-
         @Nonnull final Account account = restCreateAccount(currency);
 
         Assert.assertNotNull(account);
@@ -80,10 +68,6 @@ public class DepositTest extends BaseRestTest {
     @Test(expected = IllegalStateException.class)
     public void depositFail3Test() throws Exception {
 
-        @Nonnull final String currency = "USD";
-
-        log.info("Creating account with currency [{}]", currency);
-
         @Nonnull final Account account = restCreateAccount(currency);
 
         Assert.assertNotNull(account);
@@ -97,13 +81,11 @@ public class DepositTest extends BaseRestTest {
 
     @Test(expected = AccountNotFoundException.class)
     public void depositAccountNotFoundTest() throws Exception {
-        restDepositAccount(3232323, "USD", 1d);
+        restDepositAccount(3232323, currency, 1d);
     }
 
     @Test(expected = DifferentCurrenciesException.class)
     public void depositWrongCurrencyTest() throws Exception {
-
-        @Nonnull final String currency = "USD";
 
         @Nonnull final Account account = restCreateAccount(currency);
 

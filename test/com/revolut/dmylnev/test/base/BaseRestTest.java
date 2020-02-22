@@ -29,6 +29,8 @@ public class BaseRestTest extends BaseDBTest {
 
     private static final Logger log = LogManager.getLogger(BaseRestTest.class);
 
+    protected static @Nonnull final String currency = "USD";
+
     private static volatile Server server;
 
     protected static final int port = 8080;
@@ -176,7 +178,7 @@ public class BaseRestTest extends BaseDBTest {
         }
     }
 
-    public static @Nonnull List<Activity> restTransferAccount(final long from, final long to, @Nonnull final String currency, final double amount) throws Exception {
+    public static @Nonnull List<Activity> restTransferAccounts(final long from, final long to, @Nonnull final String currency, final double amount) throws Exception {
 
         Objects.requireNonNull(currency);
 

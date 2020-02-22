@@ -7,8 +7,6 @@ import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.entity.Activity;
 import com.revolut.dmylnev.entity.ActivityType;
 import com.revolut.dmylnev.test.base.BaseRestTest;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import javax.annotation.Nonnull;
@@ -21,14 +19,8 @@ import javax.annotation.Nullable;
 
 public class WithdrawalTest extends BaseRestTest {
 
-    private static final Logger log = LogManager.getLogger(WithdrawalTest.class);
-
     @Test
     public void withdrawalTest() throws Exception {
-
-        @Nonnull final String currency = "USD";
-
-        log.info("Creating account with currency [{}]", currency);
 
         @Nonnull final Account account = restCreateAccount(currency);
 
@@ -88,10 +80,6 @@ public class WithdrawalTest extends BaseRestTest {
     @Test(expected = IllegalStateException.class)
     public void withdrawalFail2Test() throws Exception {
 
-        @Nonnull final String currency = "USD";
-
-        log.info("Creating account with currency [{}]", currency);
-
         @Nonnull final Account account = restCreateAccount(currency);
 
         Assert.assertNotNull(account);
@@ -105,10 +93,6 @@ public class WithdrawalTest extends BaseRestTest {
 
     @Test(expected = IllegalStateException.class)
     public void withdrawalFail3Test() throws Exception {
-
-        @Nonnull final String currency = "USD";
-
-        log.info("Creating account with currency [{}]", currency);
 
         @Nonnull final Account account = restCreateAccount(currency);
 
@@ -124,7 +108,7 @@ public class WithdrawalTest extends BaseRestTest {
     @Test(expected = NotEnoughMoneyException.class)
     public void withdrawalNotEnoughMoneyTest() throws Exception {
 
-        @Nonnull final Account account = restCreateAccount("USD");
+        @Nonnull final Account account = restCreateAccount(currency);
 
         Assert.assertNotNull(account);
 
@@ -155,13 +139,11 @@ public class WithdrawalTest extends BaseRestTest {
 
     @Test(expected = AccountNotFoundException.class)
     public void withdrawalAccountNotFoundTest() throws Exception {
-        restWithdrawalAccount(32324892, "USD", 1d);
+        restWithdrawalAccount(32324892, currency, 1d);
     }
 
     @Test(expected = DifferentCurrenciesException.class)
     public void withdrawalWrongCurrencyTest() throws Exception {
-
-        @Nonnull final String currency = "USD";
 
         @Nonnull final Account account = restCreateAccount(currency);
 
