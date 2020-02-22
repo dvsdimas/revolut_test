@@ -39,6 +39,8 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
     @Override
     public @Nonnull Account createAccount(@Nonnull final String currency) throws SQLException {
 
+        if( (currency == null) || (currency.isBlank())) throw new IllegalArgumentException("Illegal currency {" + currency + "}");
+
         @Nonnull final Connection con = dbConnectionProvider.getConnection();
 
         try {

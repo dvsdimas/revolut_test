@@ -14,6 +14,7 @@ import javax.annotation.Nonnull;
 
 public abstract class BaseDBTest {
 
+    protected static @Nonnull final String currency = "USD";
     public static final double DELTA = 0.0000001;
 
     private static @Nonnull final DbConnectionProvider dbProvider = new H2ConnectionProvider("test", "user", "password");

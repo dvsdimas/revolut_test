@@ -29,8 +29,6 @@ public class BaseRestTest extends BaseDBTest {
 
     private static final Logger log = LogManager.getLogger(BaseRestTest.class);
 
-    protected static @Nonnull final String currency = "USD";
-
     private static volatile Server server;
 
     protected static final int port = 8080;
