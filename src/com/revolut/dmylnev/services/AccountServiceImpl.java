@@ -1,9 +1,6 @@
 package com.revolut.dmylnev.services;
 
-import com.revolut.dmylnev.business.exceptions.AccountNotFoundException;
-import com.revolut.dmylnev.business.exceptions.BusinessException;
-import com.revolut.dmylnev.business.exceptions.NotEnoughMoneyException;
-import com.revolut.dmylnev.business.exceptions.SameAccountTransferException;
+import com.revolut.dmylnev.business.exceptions.*;
 import com.revolut.dmylnev.database.DbConnectionProvider;
 import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.entity.Activity;
@@ -126,7 +123,7 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
             @Nullable final Account account = getAccountInternal(con, id, true);
 
             if(account == null) throw new AccountNotFoundException(id);
-            if(!account.currency.equals(currency)) throw new SQLException("Account currency is not the same as deposit " + currency);
+            if(!account.currency.equals(currency)) throw new DifferentCurrenciesException(account.currency, currency);
 
             if( (amount < 0) && (account.amount < Math.abs(amount)) ) {
                 throw new NotEnoughMoneyException(account.id, account.amount, Math.abs(amount));
@@ -183,8 +180,8 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
             if(accountFrom == null) throw new AccountNotFoundException(from);
             if(accountTo == null) throw new AccountNotFoundException(to);
 
-            if(!accountFrom.currency.equals(currency)) throw new SQLException("Account currency is not the same as " + currency); // todo
-            if(!accountTo.currency.equals(currency)) throw new SQLException("Account currency is not the same as " + currency); // todo
+            if(!accountFrom.currency.equals(currency)) throw new DifferentCurrenciesException(accountFrom.currency, currency);
+            if(!accountTo.currency.equals(currency)) throw new DifferentCurrenciesException(accountTo.currency, currency);
 
             if(accountFrom.amount < amount) throw new NotEnoughMoneyException(accountFrom.id, accountFrom.amount, Math.abs(amount));
 

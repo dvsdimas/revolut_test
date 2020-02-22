@@ -1,6 +1,7 @@
 package com.revolut.dmylnev.test.rest;
 
 import com.revolut.dmylnev.business.exceptions.AccountNotFoundException;
+import com.revolut.dmylnev.business.exceptions.DifferentCurrenciesException;
 import com.revolut.dmylnev.business.exceptions.SameAccountTransferException;
 import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.entity.Activity;
@@ -144,6 +145,48 @@ public class TransferTest extends BaseRestTest {
     @Test(expected = SameAccountTransferException.class)
     public void transferSameAccountTransferTest() throws Exception {
         restTransferAccount(123456, 123456, "USD", 1d);
+    }
+
+    @Test(expected = DifferentCurrenciesException.class)
+    public void transferWrongCurrencyTest1() throws Exception {
+
+        @Nonnull final String currency = "USD";
+
+        @Nonnull final Account accountFrom = restCreateAccount(currency);
+        @Nonnull final Account accountTo = restCreateAccount(currency);
+
+        Assert.assertNotNull(accountFrom);
+        Assert.assertNotNull(accountTo);
+
+        restTransferAccount(accountFrom.id, accountTo.id, "RUB", 1d);
+    }
+
+    @Test(expected = DifferentCurrenciesException.class)
+    public void transferWrongCurrencyTest2() throws Exception {
+
+        @Nonnull final String currency = "USD";
+
+        @Nonnull final Account accountFrom = restCreateAccount("RUB");
+        @Nonnull final Account accountTo = restCreateAccount(currency);
+
+        Assert.assertNotNull(accountFrom);
+        Assert.assertNotNull(accountTo);
+
+        restTransferAccount(accountFrom.id, accountTo.id, currency, 1d);
+    }
+
+    @Test(expected = DifferentCurrenciesException.class)
+    public void transferWrongCurrencyTest3() throws Exception {
+
+        @Nonnull final String currency = "USD";
+
+        @Nonnull final Account accountFrom = restCreateAccount(currency);
+        @Nonnull final Account accountTo = restCreateAccount("RUB");
+
+        Assert.assertNotNull(accountFrom);
+        Assert.assertNotNull(accountTo);
+
+        restTransferAccount(accountFrom.id, accountTo.id, currency, 1d);
     }
 
 }

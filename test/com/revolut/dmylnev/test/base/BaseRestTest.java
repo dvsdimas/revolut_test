@@ -1,10 +1,7 @@
 package com.revolut.dmylnev.test.base;
 
 import com.google.gson.Gson;
-import com.revolut.dmylnev.business.exceptions.AccountNotFoundException;
-import com.revolut.dmylnev.business.exceptions.BusinessException;
-import com.revolut.dmylnev.business.exceptions.NotEnoughMoneyException;
-import com.revolut.dmylnev.business.exceptions.SameAccountTransferException;
+import com.revolut.dmylnev.business.exceptions.*;
 import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.entity.Activity;
 import com.revolut.dmylnev.rest.jetty.JettyFactory;
@@ -221,9 +218,10 @@ public class BaseRestTest extends BaseDBTest {
     private static void handleErrors(final int status, @Nonnull final String content) throws BusinessException {
 
         if(status == HttpServletResponse.SC_CONFLICT) {
-            if(content.contains(NotEnoughMoneyException.msg)) throw NotEnoughMoneyException.fromJson(content);
-            if(content.contains(AccountNotFoundException.msg)) throw AccountNotFoundException.fromJson(content);
+            if(content.contains(NotEnoughMoneyException.msg))      throw NotEnoughMoneyException.fromJson(content);
+            if(content.contains(AccountNotFoundException.msg))     throw AccountNotFoundException.fromJson(content);
             if(content.contains(SameAccountTransferException.msg)) throw SameAccountTransferException.fromJson(content);
+            if(content.contains(DifferentCurrenciesException.msg)) throw DifferentCurrenciesException.fromJson(content);
         }
 
         log.error("status {}, content: {}", status, content);

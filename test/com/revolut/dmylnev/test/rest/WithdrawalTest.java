@@ -1,6 +1,7 @@
 package com.revolut.dmylnev.test.rest;
 
 import com.revolut.dmylnev.business.exceptions.AccountNotFoundException;
+import com.revolut.dmylnev.business.exceptions.DifferentCurrenciesException;
 import com.revolut.dmylnev.business.exceptions.NotEnoughMoneyException;
 import com.revolut.dmylnev.entity.Account;
 import com.revolut.dmylnev.entity.Activity;
@@ -155,6 +156,21 @@ public class WithdrawalTest extends BaseRestTest {
     @Test(expected = AccountNotFoundException.class)
     public void withdrawalAccountNotFoundTest() throws Exception {
         restWithdrawalAccount(32324892, "USD", 1d);
+    }
+
+    @Test(expected = DifferentCurrenciesException.class)
+    public void withdrawalWrongCurrencyTest() throws Exception {
+
+        @Nonnull final String currency = "USD";
+
+        @Nonnull final Account account = restCreateAccount(currency);
+
+        Assert.assertNotNull(account);
+        Assert.assertEquals(currency, account.currency);
+
+        //--------------------------------------------------------------------------------------------------------------
+
+        restWithdrawalAccount(account.id, "EUR", 1_000_000);
     }
 
 }
