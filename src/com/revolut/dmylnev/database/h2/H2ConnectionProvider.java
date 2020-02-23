@@ -81,17 +81,12 @@ public final class H2ConnectionProvider implements DbConnectionProvider {
     }
 
     @Override
-    public @Nonnull Connection getConnection() throws SQLException {
-
-        @Nonnull Connection connection = Objects.requireNonNull(DriverManager.getConnection(jdbcUrl, login, password));
-
-        connection.setAutoCommit(false);
-
-        return connection;
+    public @Nonnull Connection getConnection() throws SQLException { // can be improved by adding connection pool
+        return Objects.requireNonNull(DriverManager.getConnection(jdbcUrl, login, password));
     }
 
     @Override
-    public void releaseConnection(@Nonnull final Connection connection) {
+    public void releaseConnection(@Nonnull final Connection connection) { // can be improved by adding connection pool
         closeConnection(connection);
     }
 

@@ -45,6 +45,8 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
 
         @Nonnull final Connection con = dbConnectionProvider.getConnection();
 
+        con.setAutoCommit(false);
+
         try {
 
             con.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
@@ -79,6 +81,7 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
             throw th;
         }
         finally {
+            con.setAutoCommit(true);
             dbConnectionProvider.releaseConnection(con);
         }
     }
@@ -87,6 +90,8 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
     public @Nullable Account getAccount(final long id) throws SQLException {
 
         @Nonnull final Connection con = dbConnectionProvider.getConnection();
+
+        con.setAutoCommit(false);
 
         try {
 
@@ -104,6 +109,7 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
             throw th;
         }
         finally {
+            con.setAutoCommit(true);
             dbConnectionProvider.releaseConnection(con);
         }
     }
@@ -121,6 +127,8 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
         if(Math.abs(amount) < EPS) throw new SmallAmountException(amount);
 
         @Nonnull final Connection con = dbConnectionProvider.getConnection();
+
+        con.setAutoCommit(false);
 
         try {
 
@@ -153,6 +161,7 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
             throw th;
         }
         finally {
+            con.setAutoCommit(true);
             dbConnectionProvider.releaseConnection(con);
         }
     }
@@ -169,6 +178,8 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
         if(amount < EPS) throw new SmallAmountException(amount);
 
         @Nonnull final Connection con = dbConnectionProvider.getConnection();
+
+        con.setAutoCommit(false);
 
         try {
 
@@ -214,6 +225,7 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
             throw th;
         }
         finally {
+            con.setAutoCommit(true);
             dbConnectionProvider.releaseConnection(con);
         }
     }
@@ -222,6 +234,8 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
     public double recalculateBalanceByActivities(final long id) throws SQLException, BusinessException {
 
         @Nonnull final Connection con = dbConnectionProvider.getConnection();
+
+        con.setAutoCommit(false);
 
         try {
 
@@ -255,6 +269,7 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
             throw th;
         }
         finally {
+            con.setAutoCommit(true);
             dbConnectionProvider.releaseConnection(con);
         }
     }
