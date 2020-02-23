@@ -1,7 +1,7 @@
 CREATE TABLE accounts
 (
     id       BIGSERIAL,
-    currency VARCHAR(3) NOT NULL,
+    currency VARCHAR(10) NOT NULL,
     amount   NUMERIC(24, 10) NOT NULL DEFAULT 0,
     version  BIGINT NOT NULL DEFAULT 0
 );

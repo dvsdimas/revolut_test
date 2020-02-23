@@ -25,6 +25,7 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
     private static final Logger log = LogManager.getLogger(AccountServiceImpl.class);
 
     private static final double EPS = 0.01;
+    private static final int CUR_MAX_LEN = 10;
 
     private static @Nonnull final String getByIdSql = "SELECT id, currency, amount, version FROM accounts WHERE id = ?";
     private static @Nonnull final String getByIdSqlForUp = getByIdSql + " FOR UPDATE";
@@ -39,7 +40,7 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
     @Override
     public @Nonnull Account createAccount(@Nonnull final String currency) throws SQLException {
 
-        if( (currency == null) || (currency.isBlank())) throw new IllegalArgumentException("Illegal currency {" + currency + "}");
+        validateCurrency(currency);
 
         @Nonnull final Connection con = dbConnectionProvider.getConnection();
 
@@ -114,6 +115,8 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
     @Override
     public @Nonnull Activity deposit(final long id, @Nonnull final String currency, final double amount) throws SQLException, BusinessException {
 
+        validateCurrency(currency);
+
         if(Math.abs(amount) < EPS) throw new SmallAmountException(amount);
 
         @Nonnull final Connection con = dbConnectionProvider.getConnection();
@@ -156,6 +159,8 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
     @Override
     public @Nonnull List<Activity> transfer(final long from, final long to, @Nonnull final String currency, final double amount)
             throws SQLException, BusinessException {
+
+        validateCurrency(currency);
 
         if(from == to) throw new SameAccountTransferException(from);
 
@@ -240,6 +245,8 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
                                 final double amount,
                                 @Nullable final Long target) throws SQLException {
 
+        validateCurrency(currency);
+
         try (final PreparedStatement statement = con.prepareStatement(insertActivitySql, Statement.RETURN_GENERATED_KEYS)) {
 
             statement.setString(1, type.name());
@@ -272,6 +279,13 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
 
             statement.execute();
         }
+    }
+
+    private void validateCurrency(@Nullable final String currency) {
+
+        if( (currency == null) || (currency.isBlank())) throw new IllegalArgumentException("Empty currency name {" + currency + "}");
+
+        if(currency.length() > CUR_MAX_LEN) throw new IllegalArgumentException("Too long currency name {" + currency + "}");
     }
 
 }
