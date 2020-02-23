@@ -21,7 +21,7 @@ public class App {
 
     private static final Logger log = LogManager.getLogger(App.class);
 
-    private final static String portStr = "8090";
+    private final static String portStr = "8080";
 
     static {
 
