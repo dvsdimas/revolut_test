@@ -25,4 +25,5 @@ public interface IAccountService {
 
     @Nonnull List<Activity> transfer(final long from, final long to, @Nonnull final String currency, final double amount) throws SQLException, BusinessException;
 
+    double recalculateBalanceByActivities(final long id) throws SQLException, BusinessException;
 }

@@ -75,6 +75,7 @@ public class AccountServiceTest extends BaseDBTest {
         Assert.assertEquals(ActivityType.DEPOSIT, deposit.type);
         Assert.assertEquals(amount, deposit.amount, DELTA);
         Assert.assertNull(deposit.counterpart);
+        Assert.assertEquals(deposit.amount, accountService.recalculateBalanceByActivities(accountFrom.id), DELTA);
 
         //--------------------------------------------------------------------------------------------------------------
 
@@ -93,12 +94,14 @@ public class AccountServiceTest extends BaseDBTest {
         Assert.assertEquals(ActivityType.TRANSFER_FROM, transferFrom.type);
         Assert.assertEquals(-amount, transferFrom.amount, DELTA);
         Assert.assertEquals(accountTo.id, transferFrom.counterpart.longValue());
+        Assert.assertEquals(0, accountService.recalculateBalanceByActivities(accountFrom.id), DELTA);
 
         Assert.assertEquals(accountTo.id, transferTo.account);
         Assert.assertEquals(accountTo.currency, transferTo.currency);
         Assert.assertEquals(ActivityType.TRANSFER_TO, transferTo.type);
         Assert.assertEquals(amount, transferTo.amount, DELTA);
         Assert.assertEquals(accountFrom.id, transferTo.counterpart.longValue());
+        Assert.assertEquals(amount, accountService.recalculateBalanceByActivities(accountTo.id), DELTA);
 
         //--------------------------------------------------------------------------------------------------------------
 
@@ -111,6 +114,7 @@ public class AccountServiceTest extends BaseDBTest {
         Assert.assertEquals(ActivityType.WITHDRAWAL, withdrawal.type);
         Assert.assertEquals(-amount, withdrawal.amount, DELTA);
         Assert.assertNull(withdrawal.counterpart);
+        Assert.assertEquals(0, accountService.recalculateBalanceByActivities(accountTo.id), DELTA);
 
         //--------------------------------------------------------------------------------------------------------------
 

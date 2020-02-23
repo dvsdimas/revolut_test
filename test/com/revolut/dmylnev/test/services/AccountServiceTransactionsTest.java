@@ -88,24 +88,33 @@ public class AccountServiceTransactionsTest extends BaseDBTest {
 
         Assert.assertEquals(amount * count * size, accountService.getAccount(accountFrom.id).amount, DELTA);
         Assert.assertEquals(count * size, accountService.getAccount(accountFrom.id).version);
+        Assert.assertEquals(amount * count * size, accountService.recalculateBalanceByActivities(accountFrom.id), DELTA);
+
         Assert.assertEquals(0, accountService.getAccount(accountTo.id).amount, DELTA);
         Assert.assertEquals(0, accountService.getAccount(accountTo.id).version);
+        Assert.assertEquals(0, accountService.recalculateBalanceByActivities(accountTo.id), DELTA);
 
         latch4.countDown();
         latch5.await();
 
         Assert.assertEquals(0, accountService.getAccount(accountFrom.id).amount, DELTA);
         Assert.assertEquals(3 * count * size - 1, accountService.getAccount(accountFrom.id).version);
+        Assert.assertEquals(0, accountService.recalculateBalanceByActivities(accountFrom.id), DELTA);
+
         Assert.assertEquals(amount * count * size, accountService.getAccount(accountTo.id).amount, DELTA);
         Assert.assertEquals(3 * count * size, accountService.getAccount(accountTo.id).version);
+        Assert.assertEquals(amount * count * size, accountService.recalculateBalanceByActivities(accountTo.id), DELTA);
 
         latch6.countDown();
         latch7.await();
 
         Assert.assertEquals(0, accountService.getAccount(accountFrom.id).amount, DELTA);
         Assert.assertEquals(3 * count * size - 1, accountService.getAccount(accountFrom.id).version);
+        Assert.assertEquals(0, accountService.recalculateBalanceByActivities(accountFrom.id), DELTA);
+
         Assert.assertEquals(0, accountService.getAccount(accountTo.id).amount, DELTA);
         Assert.assertEquals(4 * count * size, accountService.getAccount(accountTo.id).version);
+        Assert.assertEquals(0, accountService.recalculateBalanceByActivities(accountTo.id), DELTA);
     }
 
 }

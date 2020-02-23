@@ -32,6 +32,7 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
     private static @Nonnull final String createAccountSql = "INSERT INTO accounts (currency) VALUES (?)";
     private static @Nonnull final String updateAccountSql = "UPDATE accounts SET amount = ?, version = ? WHERE id = ?";
     private static @Nonnull final String insertActivitySql = "INSERT INTO activities (type, currency, amount, account, counterpart) VALUES (?, ?, ?, ?, ?)";
+    private static @Nonnull final String calcActivitySql = "SELECT sum(amount) FROM activities WHERE account = ?";
 
     public AccountServiceImpl(@Nonnull DbConnectionProvider dbConnectionProvider) {
         super(dbConnectionProvider);
@@ -209,6 +210,47 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
 
         } catch (Throwable th) {
             log.error("transfer error", th);
+            con.rollback();
+            throw th;
+        }
+        finally {
+            dbConnectionProvider.releaseConnection(con);
+        }
+    }
+
+    @Override
+    public double recalculateBalanceByActivities(final long id) throws SQLException, BusinessException {
+
+        @Nonnull final Connection con = dbConnectionProvider.getConnection();
+
+        try {
+
+            con.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+
+            @Nullable final Account account = getAccountInternal(con, id, true);
+
+            if(account == null) throw new AccountNotFoundException(id);
+
+            double balance = 0;
+
+            try (@Nonnull final PreparedStatement statement = con.prepareStatement(calcActivitySql)) {
+
+                statement.setLong(1, id);
+
+                try (@Nonnull final ResultSet resultSet = statement.executeQuery()) {
+
+                    if(resultSet.next()) {
+                        balance = resultSet.getDouble(1);
+                    }
+                }
+            }
+
+            con.commit();
+
+            return balance;
+
+        } catch (Throwable th) {
+            log.error("recalculateBalanceByActivities error", th);
             con.rollback();
             throw th;
         }
