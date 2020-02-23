@@ -8,7 +8,7 @@ CREATE TABLE accounts
 
 CREATE TABLE activities
 (
-    id          SERIAL,
+    id          BIGSERIAL,
     type        VARCHAR(20) NOT NULL,
     currency    VARCHAR(10) NOT NULL,
     amount      NUMERIC(24, 10) NOT NULL,
