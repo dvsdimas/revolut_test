@@ -83,7 +83,7 @@ public class AccountServiceImpl extends BaseService implements IAccountService {
     }
 
     @Override
-    public @Nullable Account getAccount(@Nonnull final Long id) throws SQLException {
+    public @Nullable Account getAccount(final long id) throws SQLException {
 
         @Nonnull final Connection con = dbConnectionProvider.getConnection();
 

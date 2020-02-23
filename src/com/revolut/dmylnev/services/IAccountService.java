@@ -17,7 +17,7 @@ public interface IAccountService {
 
     @Nonnull Account createAccount(@Nonnull final String currency) throws SQLException;
 
-    @Nullable Account getAccount(@Nonnull final Long id) throws SQLException;
+    @Nullable Account getAccount(final long id) throws SQLException;
 
     @Nonnull Activity deposit(final long id, @Nonnull final String currency, final double amount) throws SQLException, BusinessException;
 

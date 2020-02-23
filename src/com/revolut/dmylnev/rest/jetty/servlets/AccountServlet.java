@@ -53,7 +53,7 @@ public class AccountServlet extends BusinessServlet {
 
         log.info("Trying to get Account with the id [{}]", strId);
 
-        @Nonnull final Long id = Long.valueOf(strId);
+        final long id = Long.parseLong(strId);
 
         @Nullable final Account account = ServicesProvider.getAccountService().getAccount(id);
 
