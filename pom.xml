@@ -100,7 +100,7 @@
                     <verbose>true</verbose>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
-                    <fork>true</fork>
+<!--                    <fork>true</fork>-->
                     <encoding>UTF8</encoding>
                     <useIncrementalCompilation>false</useIncrementalCompilation>
                 </configuration>
